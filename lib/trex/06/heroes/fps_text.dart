@@ -7,17 +7,17 @@ class FpsText extends PositionComponent {
   final Color color;
 
 
-  FpsText({this.color=Colors.grey});
+  FpsText({this.color=Colors.white});
 
-  @override
-  void onGameResize(Vector2 size) {
-    super.onGameResize(size);
-    x = 10;
-    y = 8;
-  }
+  // @override
+  // void onGameResize(Vector2 size) {
+  //   super.onGameResize(size);
+  //   x = 10;
+  //   y = 8;
+  // }
 
   late TextComponent text = TextComponent(
-    textRenderer: TextPaint(style: TextStyle(fontSize: 14, color: color)),
+    textRenderer: TextPaint(style: TextStyle(fontSize: 24, color: color)),
   );
 
   @override

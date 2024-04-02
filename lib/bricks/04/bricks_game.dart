@@ -7,6 +7,7 @@ import 'package:flame/image_composition.dart';
 import 'package:flame_ext/flame_ext.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/services.dart';
+import '../res/extra_images.dart';
 import 'config/audio_manager/audio_manager.dart';
 import 'config/audio_manager/sound_effect.dart';
 import 'heroes/ball.dart';
@@ -52,6 +53,8 @@ class BricksGame extends FlameGame<PlayWorld>
     await loader.load(
       'assets/images/break_bricks/break_bricks.json',
       'break_bricks/break_bricks.png',
+      extra: extraImages,
+
     );
     bgImage = await Flame.images.load('break_bricks/bg_gallery.png');
     camera.viewfinder.anchor = Anchor.topLeft;

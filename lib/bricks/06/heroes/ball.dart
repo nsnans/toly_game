@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+
 import '../config/audio_manager/sound_effect.dart';
 import '../heroes/bricks.dart';
 
@@ -12,8 +13,8 @@ import 'game_top_bar/brick_wall.dart';
 import 'playground.dart';
 import 'paddle.dart';
 
-class Ball extends SpriteComponent with HasGameRef<BricksGame>, CollisionCallbacks {
-
+class Ball extends SpriteComponent
+    with HasGameRef<BricksGame>, CollisionCallbacks {
   @override
   FutureOr<void> onLoad() {
     sprite = game.loader['Ball_Blue_Shiny-32x32.png'];
@@ -55,27 +56,40 @@ class Ball extends SpriteComponent with HasGameRef<BricksGame>, CollisionCallbac
   // void setDragPosition(Vector2? localPosition){
   //   endPoint = localPosition;
   // }
+  @override
+  void onRemove() {
+    bool noBall = game.world.children.whereType<Ball>().isEmpty;
+    if (noBall) {
+      game.world.died();
+    }
+    super.onRemove();
+  }
 
   @override
   void onCollisionStart(
       Set<Vector2> intersectionPoints, PositionComponent other) {
-    if (other is Paddle||other is BrickWall) {
+    if (other is Paddle || other is BrickWall) {
       _handleHitPaddle(intersectionPoints.first);
       game.am.play(SoundEffect.ballBrick);
     } else if (other is Brick) {
-      _lockCollisionTest(()=> _handleHitBrick(intersectionPoints.first, other));
+      if (game.world.isInvincible) {
+        other.removeFromParent();
+        game.world.propManager.fallOrNot(other.id);
+        game.am.play(SoundEffect.uiSelect);
+        return;
+      }
+      _lockCollisionTest(
+          () => _handleHitBrick(intersectionPoints.first, other));
     } else if (other is Playground) {
       _handleHitPlayground(intersectionPoints.first, other.size);
       game.am.play(SoundEffect.bitWall);
-
     }
     super.onCollisionStart(intersectionPoints, other);
   }
 
   void _handleHitPlayground(Vector2 position, Vector2 areaSize) {
-    if(position.y >= areaSize.y-height){
-      game.world.died();
-      v = Vector2(0, 0);
+    if (position.y >= areaSize.y - height) {
+      removeFromParent();
       return;
     }
 
@@ -104,7 +118,7 @@ class Ball extends SpriteComponent with HasGameRef<BricksGame>, CollisionCallbac
   // 锁定砖块碰撞检测
   bool _lockedHitBrick = false;
 
-  void _lockCollisionTest(VoidCallback callback){
+  void _lockCollisionTest(VoidCallback callback) {
     if (_lockedHitBrick) return;
     _lockedHitBrick = true;
     callback();
@@ -113,22 +127,25 @@ class Ball extends SpriteComponent with HasGameRef<BricksGame>, CollisionCallbac
 
   void _handleHitBrick(Vector2 hitPos, Brick brick) {
 
-    Vector2 hitP = hitPos - brick.position;
+      Vector2 hitP = hitPos - brick.position;
 
-    if (hitP.y <= 0) {
-      // 顶部碰撞
-      v.y = -v.y;
-    } else if (hitP.x <= 0) {
-      // 左部碰撞
-      v.x = -v.x;
-    } else if (hitP.y >= brick.height ) {
-      // 下部碰撞
-      v.y = -v.y;
-    } else if (hitP.x >= brick.width) {
-      // 右部碰撞
-      v.x = -v.x;
-    }
+      if (hitP.y <= 0) {
+        // 顶部碰撞
+        v.y = -v.y;
+      } else if (hitP.x <= 0) {
+        // 左部碰撞
+        v.x = -v.x;
+      } else if (hitP.y >= brick.height) {
+        // 下部碰撞
+        v.y = -v.y;
+      } else if (hitP.x >= brick.width) {
+        // 右部碰撞
+        v.x = -v.x;
+      }
+
+
     brick.removeFromParent();
+    game.world.propManager.fallOrNot(brick.id);
     game.am.play(SoundEffect.uiSelect);
   }
 }

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:toly_game/trex/06/ext/hit_box_show.dart';
 import 'package:toly_game/trex/06/heroes/fps_text.dart';
+import '../res/extra_images.dart';
 import 'heroes/ball.dart';
 
 import 'heroes/bricks.dart';
@@ -44,6 +45,8 @@ class BricksGame extends FlameGame
     await loader.load(
       'assets/images/break_bricks/break_bricks.json',
       'break_bricks/break_bricks.png',
+      extra: extraImages,
+
     );
     add(Playground());
     add(FpsText());

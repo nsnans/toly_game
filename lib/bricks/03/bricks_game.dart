@@ -5,6 +5,7 @@ import 'package:flame/game.dart';
 import 'package:flame_ext/flame_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../res/extra_images.dart';
 import 'heroes/ball.dart';
 
 import 'heroes/bricks.dart';
@@ -30,6 +31,8 @@ class BricksGame extends FlameGame<PlayWorld>
     await loader.load(
       'assets/images/break_bricks/break_bricks.json',
       'break_bricks/break_bricks.png',
+      extra: extraImages,
+
     );
     camera.viewfinder.anchor=Anchor.topLeft;
   }

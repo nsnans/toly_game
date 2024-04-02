@@ -2,13 +2,16 @@ import 'dart:async';
 import 'package:flame/game.dart';
 import 'package:flame_ext/flame_ext.dart';
 
+import '../res/extra_images.dart';
 import 'heroes/ball.dart';
 import 'heroes/bricks.dart';
 import 'heroes/paddle.dart';
 
 class BricksGame extends FlameGame {
   TextureLoader loader = TextureLoader();
+
   double get width => size.x;
+
   double get height => size.y;
 
   Brick brick = Brick();
@@ -33,6 +36,7 @@ class BricksGame extends FlameGame {
     await loader.load(
       'assets/images/break_bricks/break_bricks.json',
       'break_bricks/break_bricks.png',
+      extra: extraImages,
     );
     add(paddle);
     add(ball);

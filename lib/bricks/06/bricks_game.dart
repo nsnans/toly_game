@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 import 'package:flame/components.dart';
@@ -10,17 +11,21 @@ import 'package:flame_ext/flame_ext.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toly_game/bricks/05/config/game_config.dart';
-import 'package:toly_game/bricks/05/model/level.dart';
 import '../res/extra_images.dart';
 import 'config/audio_manager/audio_manager.dart';
 import 'config/audio_manager/sound_effect.dart';
+import 'config/game_config.dart';
 import 'heroes/ball.dart';
 
 import 'heroes/bricks.dart';
+import 'heroes/bullet.dart';
 import 'heroes/playground.dart';
 import 'heroes/paddle.dart';
 import 'heroes/game_top_bar/game_top_bar.dart';
+import 'heroes/prop/prop.dart';
+import 'heroes/prop/prop_display.dart';
+import 'heroes/prop/prop_manager.dart';
+import 'model/level.dart';
 
 const Size kViewPort = Size(64 * 9, 64 * 9 * 2400 / 1080);
 
@@ -55,6 +60,16 @@ class BricksGame extends FlameGame<PlayWorld>
   int _levelNum = 1;
 
   int get levelCount => _levels.length;
+
+  final Random _random = Random();
+
+  Random get random => _random;
+
+  // value: 概率 0~1
+  bool probability(double value) {
+    double rad = random.nextDouble();
+    return rad < value;
+  }
 
   set levelNum(int level) {
     if (_levelNum != level) {
@@ -131,10 +146,11 @@ class PlayWorld extends World
         DragCallbacks,
         HasCollisionDetection,
         TapCallbacks {
-  Ball ball = Ball();
   Paddle paddle = Paddle();
 
   late BrickManager brickManager = BrickManager();
+  BulletManager bulletManager = BulletManager();
+  late PropManager propManager = PropManager();
 
   GameTopBar titleBar = GameTopBar();
   int _life = 3;
@@ -143,7 +159,6 @@ class PlayWorld extends World
     game.status = GameStatus.gameOver;
     game.am.play(SoundEffect.uiClose);
     game.overlays.add('GameOverMenu');
-    ball.removeFromParent();
   }
 
   void checkSuccess() {
@@ -158,6 +173,47 @@ class PlayWorld extends World
     }
   }
 
+  void addLife() {
+    _life += 1;
+    titleBar.updateLifeCount(_life);
+  }
+
+  /// 是否处于 无敌状态
+  bool get isInvincible =>
+      displays.where((e) => e.prop == Prop.invincible).isNotEmpty;
+
+  /// 是否处于 射击状态
+  bool get isShoot =>
+      displays.where((e) => e.prop == Prop.shoot).isNotEmpty;
+
+  List<PropDisplay> get displays => children.whereType<PropDisplay>().toList();
+
+
+
+  void addPropDisplay(Prop pro) {
+    /// 没有道具展示时，添加 PropDisplay
+    if (displays.isEmpty) {
+      PropDisplay display = PropDisplay(pro);
+      display.position = Vector2(360, 86);
+      add(display);
+      return;
+    }
+
+    /// 表示已经存在展示的道具
+    List<PropDisplay> targets = displays.where((e) => e.prop == pro).toList();
+    if (targets.isNotEmpty) {
+      /// 已存当前道具效力, + 生命时间
+      displays.first.addOne();
+      return;
+    } else {
+      /// 有没有，则在之后加一个
+      PropDisplay display = PropDisplay(pro);
+      display.position =
+          displays.last.position + Vector2(displays.last.width + 8, 0);
+      add(display);
+    }
+  }
+
   void died() {
     _life -= 1;
     titleBar.updateLifeCount(_life);
@@ -166,7 +222,7 @@ class PlayWorld extends World
     if (_life == 0) {
       gameOver();
     } else {
-      changeBallPosition();
+      addBall();
     }
   }
 
@@ -175,24 +231,19 @@ class PlayWorld extends World
     super.onLoad();
     add(Playground());
     add(paddle);
-    add(ball);
+    addBall();
     add(brickManager);
+    add(propManager);
+    add(bulletManager);
     add(titleBar);
     initPosition();
     // toggleHitBoxTree();
+    // add(FpsTextComponent()..y=kViewPort.height-42..x=12);
   }
 
   void initPosition() {
     brickManager.y = titleBar.height;
-    changeBallPosition();
-  }
-
-  void changeBallPosition() {
-    ball.position = paddle.position +
-        Vector2(
-          (paddle.width - ball.width) / 2,
-          (paddle.height - ball.height) / 2 - paddle.height - 4,
-        );
+    propManager.y = titleBar.height;
   }
 
   @override
@@ -202,8 +253,11 @@ class PlayWorld extends World
 
   void play() {
     if (game.status == GameStatus.ready) {
-      ball.run();
-      game.status = GameStatus.playing;
+      List<Ball> balls = children.whereType<Ball>().toList();
+      if (balls.isNotEmpty) {
+        balls.first.run();
+        game.status = GameStatus.playing;
+      }
     }
   }
 
@@ -211,13 +265,23 @@ class PlayWorld extends World
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     double dx = event.localDelta.x;
-    double max = kViewPort.width - paddle.width;
-    paddle.x = (paddle.x + dx).clamp(0, max);
+    double max = kViewPort.width - paddle.width/2;
+    paddle.x = (paddle.x + dx).clamp(paddle.width/2, max);
   }
 
   @override
   void onDragEnd(DragEndEvent event) {
     super.onDragEnd(event);
     play();
+  }
+
+  void addBall({bool autoPlay = false}) {
+    Ball ball = Ball();
+    ball.anchor = Anchor.bottomCenter;
+    add(ball);
+    ball.position = paddle.center - Vector2(0, paddle.height / 2 + 4);
+    if (autoPlay) {
+      ball.run();
+    }
   }
 }
