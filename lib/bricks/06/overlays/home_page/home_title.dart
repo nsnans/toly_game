@@ -3,6 +3,7 @@ import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
 
 import '../../bricks_game.dart';
+import '../../config/audio_manager/sound_effect.dart';
 
 class HomeTitle extends StatelessWidget {
   final BricksGame game;
@@ -22,6 +23,28 @@ class HomeTitle extends StatelessWidget {
                 blueCrystal: game.config.blueCrystal,
                 coin: game.config.coin,
               ),
+            ),
+            Spacer(),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 8.0),
+            //   child: SpriteButton(
+            //     onPressed: () {
+            //       game.am.play(SoundEffect.uiClick);
+            //       game.overlays.add('PackagePage');
+            //     },
+            //     label: const Text(
+            //       '',
+            //       style: TextStyle(color: Colors.white),
+            //     ),
+            //     sprite: game.loader['package.png'],
+            //     pressedSprite: game.loader['package.png'],
+            //     height: 24,
+            //     width: 24,
+            //   ),
+            // ),
+            // Text("背包",style: TextStyle(color: Colors.white),)
+            const SizedBox(
+              width: 12,
             )
           ],
         ),
@@ -48,8 +71,13 @@ class HomeTitle extends StatelessWidget {
 class CoinWidget extends StatelessWidget {
   final int blueCrystal;
   final int coin;
+  final double spacing;
 
-  const CoinWidget({super.key, required this.blueCrystal, required this.coin});
+  const CoinWidget(
+      {super.key,
+      required this.blueCrystal,
+      required this.coin,
+       this.spacing=16});
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +101,7 @@ class CoinWidget extends StatelessWidget {
           blueCrystal.toString(),
           style: const TextStyle(color: Colors.white),
         ),
-        const SizedBox(width: 16),
+         SizedBox(width: spacing),
         _buildCoin(),
       ],
     );
@@ -102,5 +130,28 @@ class CoinWidget extends StatelessWidget {
         )
       ],
     );
+  }
+}
+
+class CoinImage extends StatelessWidget {
+  final double size;
+  final bool playing;
+
+  const CoinImage({super.key, required this.size, this.playing = true});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        width: size,
+        height: size,
+        child: SpriteAnimationWidget.asset(
+          playing: playing,
+          path: 'break_bricks/MonedaD.png',
+          data: SpriteAnimationData.sequenced(
+            amount: 5,
+            stepTime: 0.15,
+            textureSize: Vector2(16, 16),
+          ),
+        ));
   }
 }

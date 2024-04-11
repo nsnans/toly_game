@@ -24,7 +24,7 @@ class PropManager extends PositionComponent with HasGameRef<BricksGame> {
     List<Brick> bricks = brickManager.children.whereType<Brick>().toList();
     List<Prop> propPool = Prop.values.toList();
     for (Brick brick in bricks) {
-      bool hit = game.probability(0.25);
+      bool hit = game.probability(0.20);
       if (hit) {
         int index = game.random.nextInt(propPool.length);
         Prop active = propPool[index];

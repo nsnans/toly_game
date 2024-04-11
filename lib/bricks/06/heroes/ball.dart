@@ -32,30 +32,9 @@ class Ball extends SpriteComponent
   }
 
   void run() {
-    // int speed  = 350;
-    // Vector2 pos = (endPoint!-position);
-    //
-    // double angle =  pos.angleToSigned(position);
-    // print("===$angle=============");
-    // // v = Vector2(-speed*cos(angle), -speed*sin(angle));
     v = Vector2(-350, -350);
   }
 
-  // @override
-  // void render(Canvas canvas) {
-  //   super.render(canvas);
-  //   if(endPoint!=null){
-  //     Vector2 center = size/2;
-  //     canvas.drawLine(center.toOffset(), (endPoint!-position).toOffset(), Paint()..style=PaintingStyle.stroke..color=Colors.white);
-  //
-  //   }
-  // }
-  //
-  // Vector2? endPoint;
-  //
-  // void setDragPosition(Vector2? localPosition){
-  //   endPoint = localPosition;
-  // }
   @override
   void onRemove() {
     bool noBall = game.world.children.whereType<Ball>().isEmpty;
@@ -65,6 +44,10 @@ class Ball extends SpriteComponent
     super.onRemove();
   }
 
+
+
+
+
   @override
   void onCollisionStart(
       Set<Vector2> intersectionPoints, PositionComponent other) {
@@ -73,9 +56,7 @@ class Ball extends SpriteComponent
       game.am.play(SoundEffect.ballBrick);
     } else if (other is Brick) {
       if (game.world.isInvincible) {
-        other.removeFromParent();
-        game.world.propManager.fallOrNot(other.id);
-        game.am.play(SoundEffect.uiSelect);
+        game.world.onBrickWillRemove(other);
         return;
       }
       _lockCollisionTest(
@@ -142,10 +123,6 @@ class Ball extends SpriteComponent
         // 右部碰撞
         v.x = -v.x;
       }
-
-
-    brick.removeFromParent();
-    game.world.propManager.fallOrNot(brick.id);
-    game.am.play(SoundEffect.uiSelect);
+      game.world.onBrickWillRemove(brick);
   }
 }

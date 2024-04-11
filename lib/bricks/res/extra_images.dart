@@ -41,6 +41,16 @@ List<String> get extraImages {
     'break_bricks/panel.png',
     'break_bricks/Window04.png',
     'break_bricks/level.png',
+    'break_bricks/package.png',
+    'break_bricks/Btn_V01.png',
+    'break_bricks/Btn_V05.png',
+    'break_bricks/prop_show_5s.png',
+    'break_bricks/Cell01.png',
+    'break_bricks/prop_random.png',
+    'break_bricks/coin.png',
+    'break_bricks/package_panel.png',
+    'break_bricks/package_cell.png',
+    'break_bricks/package_tab.png',
   ];
   result.addAll(Prop.values.map((e) => 'break_bricks/${e.src}'));
   return result;

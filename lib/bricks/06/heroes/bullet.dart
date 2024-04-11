@@ -70,9 +70,7 @@ class Bullet extends PositionComponent with HasGameRef<BricksGame>, CollisionCal
       Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
     if (other is Brick) {
-      other.removeFromParent();
-      game.world.propManager.fallOrNot(other.id);
-      removeFromParent();
+      game.world.onBrickWillRemove(other);
     }
     if (other is BrickWall) {
       removeFromParent();

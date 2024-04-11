@@ -7,19 +7,40 @@ import 'package:toly_game/bricks/06/heroes/prop/prop.dart';
 
 import '../bricks_game.dart';
 
+enum PaddleType{
+  pink('Paddle_C_Red_96x28.png','Paddle_C_Red_192x28.png'),
+  blue('Paddle_C_Blue_96x28.png','Paddle_C_Blue_192x28.png'),
+  purple('Paddle_B_Purple_96x28.png','Paddle_B_Purple_192x28.png'),
+  yellow('Paddle_B_Yellow_96x28.png','Paddle_B_Yellow_192x28.png'),
+  red('Paddle_A_Red_96x28.png','Paddle_A_Red_192x28.png'),
+  azure('Paddle_A_Blue_96x28.png','Paddle_A_Blue_192x28.png'),
+  ;
+  final String src;
+  final String expandSrc;
+
+  const PaddleType(this.src,this.expandSrc);
+}
+
 class Paddle extends SpriteComponent with HasGameRef<BricksGame> , CollisionCallbacks {
 
   void expand(){
-    sprite = game.loader['Paddle_A_Blue_192x28.png'];
+    String src = game.paddleType.expandSrc;
+    sprite = game.loader[src];
   }
 
   void expandEnd(){
-    sprite = game.loader['Paddle_A_Blue_96x28.png'];
+    String src = game.paddleType.src;
+    sprite = game.loader[src];
   }
+
+  void switchType(String src) {
+    sprite = game.loader[src];
+  }
+
 
   @override
   FutureOr<void> onLoad() {
-    sprite = game.loader['Paddle_A_Blue_96x28.png'];
+    sprite = game.loader[game.paddleType.src];
     add(RectangleHitbox());
     anchor =Anchor.center;
     y = kViewPort.height - 160;
@@ -47,10 +68,15 @@ class Paddle extends SpriteComponent with HasGameRef<BricksGame> , CollisionCall
   @override
   void onCollisionStart(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollisionStart(intersectionPoints, other);
+    if(other is CoinComponent){
+      game.getCoin();
+      other.removeFromParent();
+    }
     if(other is PropComponent){
       onGetProp(other.prop);
       other.removeFromParent();
     }
+
   }
 
   void onGetProp(Prop prop){
@@ -70,4 +96,5 @@ class Paddle extends SpriteComponent with HasGameRef<BricksGame> , CollisionCall
     }
     game.world.addPropDisplay(prop);
   }
+
 }

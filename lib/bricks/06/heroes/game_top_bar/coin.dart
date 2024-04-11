@@ -6,11 +6,15 @@ import 'package:flutter/material.dart';
 import '../../bricks_game.dart';
 
 class Coin extends PositionComponent with HasGameRef<BricksGame> {
-  final TextComponent leverText = TextComponent(
-    text: "1024",
+  late final TextComponent leverText = TextComponent(
+    text: game.config.coin.toString(),
     textRenderer:
     TextPaint(style: const TextStyle(color: Colors.white, fontSize: 24)),
   );
+
+  void updateCoin(){
+    leverText.text = game.config.coin.toString();
+  }
 
   @override
   FutureOr<void> onLoad() async {

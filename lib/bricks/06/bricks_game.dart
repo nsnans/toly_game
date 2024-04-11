@@ -11,6 +11,8 @@ import 'package:flame_ext/flame_ext.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:toly_game/bricks/06/config/buy_goods.dart';
+import 'package:toly_game/bricks/06/overlays/shop_page/goods.dart';
 import '../res/extra_images.dart';
 import 'config/audio_manager/audio_manager.dart';
 import 'config/audio_manager/sound_effect.dart';
@@ -26,6 +28,7 @@ import 'heroes/prop/prop.dart';
 import 'heroes/prop/prop_display.dart';
 import 'heroes/prop/prop_manager.dart';
 import 'model/level.dart';
+import 'overlays/shop_page/goods_mamager.dart';
 
 const Size kViewPort = Size(64 * 9, 64 * 9 * 2400 / 1080);
 
@@ -42,8 +45,28 @@ class BricksGame extends FlameGame<PlayWorld>
           world: PlayWorld(),
         );
 
-  TextureLoader loader = TextureLoader();
+  PaddleType get paddleType => configManager.config.paddleType;
 
+  void switchPaddle(String src) {
+    PaddleType type = PaddleType.values.singleWhere((e) => e.src == src);
+    configManager.switchPaddleType(type);
+    world.paddle.switchType(src);
+  }
+
+  List<PaddleType> get buyPaddles => configManager.config.activePaddles
+      .map((e) => PaddleType.values[e])
+      .toList();
+
+  List<String> get buyPaddleSrcs => buyPaddles
+      .map((e) =>e.src)
+      .toList();
+
+  List<Goods> get buyPaddleGoods =>
+      goodsManager.goods(GoodsType.paddle)
+      .where((e) => buyPaddleSrcs.contains(e.src)).toList();
+
+  TextureLoader loader = TextureLoader();
+  GoodsManager goodsManager = GoodsManager();
   GameStatus status = GameStatus.ready;
 
   late AudioManager am;
@@ -113,6 +136,7 @@ class BricksGame extends FlameGame<PlayWorld>
       'break_bricks/break_bricks.png',
       extra: extraImages,
     );
+    await goodsManager.loadGoods();
     bgImage = await Flame.images.load('break_bricks/bg_gallery.png');
     camera.viewfinder.anchor = Anchor.topLeft;
   }
@@ -137,6 +161,24 @@ class BricksGame extends FlameGame<PlayWorld>
       }
     }
     return KeyEventResult.handled;
+  }
+
+  void getCoin() {
+      configManager.addCoin();
+      world.titleBar.coin.updateCoin();
+  }
+
+
+  void buy(Goods goods) {
+    if(goods.type==GoodsType.paddle){
+      String src = goods.src;
+      PaddleType type = PaddleType.values.singleWhere((e) => e.src==src);
+      configManager.buyPaddleSuccess(type);
+    }else{
+      configManager.saveGoodsToPackage(goods);
+    }
+    configManager.addCoin(count: -(goods.coin??0));
+    world.titleBar.coin.updateCoin();
   }
 }
 
@@ -183,12 +225,9 @@ class PlayWorld extends World
       displays.where((e) => e.prop == Prop.invincible).isNotEmpty;
 
   /// 是否处于 射击状态
-  bool get isShoot =>
-      displays.where((e) => e.prop == Prop.shoot).isNotEmpty;
+  bool get isShoot => displays.where((e) => e.prop == Prop.shoot).isNotEmpty;
 
   List<PropDisplay> get displays => children.whereType<PropDisplay>().toList();
-
-
 
   void addPropDisplay(Prop pro) {
     /// 没有道具展示时，添加 PropDisplay
@@ -265,8 +304,8 @@ class PlayWorld extends World
   void onDragUpdate(DragUpdateEvent event) {
     super.onDragUpdate(event);
     double dx = event.localDelta.x;
-    double max = kViewPort.width - paddle.width/2;
-    paddle.x = (paddle.x + dx).clamp(paddle.width/2, max);
+    double max = kViewPort.width - paddle.width / 2;
+    paddle.x = (paddle.x + dx).clamp(paddle.width / 2, max);
   }
 
   @override
@@ -283,5 +322,19 @@ class PlayWorld extends World
     if (autoPlay) {
       ball.run();
     }
+  }
+
+  void createCoin(Vector2 position) {
+    if (game.probability(0.20)) {
+      CoinComponent coin = CoinComponent(position: position);
+      add(coin);
+    }
+  }
+
+  void onBrickWillRemove(Brick brick) {
+    brick.removeFromParent();
+    propManager.fallOrNot(brick.id);
+    createCoin(brick.absolutePosition + brick.size / 2);
+    game.am.play(SoundEffect.uiSelect);
   }
 }

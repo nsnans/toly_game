@@ -8,7 +8,9 @@ import 'overlays/lever_page/level_page.dart';
 import 'overlays/menus/exit_menu.dart';
 import 'overlays/menus/game_over_menu.dart';
 import 'overlays/menus/game_win_menu.dart';
+import 'overlays/menus/goods_info_menu.dart';
 import 'overlays/menus/pause_menu.dart';
+import 'overlays/package_page/package_page.dart';
 import 'overlays/settings/settings_page.dart';
 import 'overlays/shop_page/shop_page.dart';
 
@@ -61,8 +63,9 @@ class BricksGameApp extends StatelessWidget {
         'PauseMenu': (_, game) => PauseMenu(game: game),
         'ExitMenu': (_, game) => ExitMenu(game: game),
         'GameOverMenu': (_, game) => GameOverMenu(game: game),
+        'GoodsInfoMenu': (_, game) => GoodsInfoMenu(game: game,),
         'GameSuccessMenu': (_, game) => GameSuccessMenu(game: game),
-        // 'GameOver': (_, game) => GameOver(game: game),
+        'PackagePage': (_, game) => PackagePage(game: game),
       },
       initialActiveOverlays: const ['HomePage'],
     );

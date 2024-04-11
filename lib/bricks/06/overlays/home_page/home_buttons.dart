@@ -31,6 +31,7 @@ class HomeButtons extends StatelessWidget {
             height: height,
             width: width,
           ),
+
           SpriteButton(
             onPressed: () {
               game.am.play(SoundEffect.uiClick);
@@ -56,11 +57,22 @@ class HomeButtons extends StatelessWidget {
           SpriteButton(
             onPressed: () {
               game.am.play(SoundEffect.uiOpen);
+              game.overlays.add('PackagePage');
+            },
+            label: const Text('我的背包', style: style),
+            sprite: game.loader['Btn_V03.png'],
+            pressedSprite: game.loader['Btn_V04.png'],
+            height: height,
+            width: width,
+          ),
+          SpriteButton(
+            onPressed: () {
+              game.am.play(SoundEffect.uiClick);
               game.overlays.add('Settings');
             },
             label: const Text('系统设置', style: style),
-            sprite: game.loader['Btn_V03.png'],
-            pressedSprite: game.loader['Btn_V04.png'],
+            sprite: game.loader['Btn_V01.png'],
+            pressedSprite: game.loader['Btn_V05.png'],
             height: height,
             width: width,
           ),
