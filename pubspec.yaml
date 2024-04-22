@@ -12,13 +12,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flame: ^1.16.0
+#  flame: ^1.16.0
+  flame: ^1.17.0
   flame_audio: ^2.10.0
   shared_preferences: ^2.2.2
   cupertino_icons: ^1.0.2
   flame_forge2d: ^0.16.0+5
   window_manager: ^0.3.8      # 桌面管理
-
+#  web: ^0.5.1
   flame_ext:
     path: packages/flame_ext
 
@@ -26,6 +27,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: ^0.18.0
+  oktoast: ^3.4.0
+  tolyui: ^0.0.1
+  url_launcher: ^6.2.5 # url 跳转
 
 dev_dependencies:
   flutter_test:
@@ -42,6 +46,9 @@ flutter:
     - assets/images/demos/
     - assets/images/trex/
     - assets/images/break_bricks/
+    - assets/images/break_bricks/boom/
+    - assets/images/break_bricks/bottom/
+    - assets/images/break_bricks/died/
     - assets/audio/
     - assets/audio/break_bricks/
     - assets/audio/ui/

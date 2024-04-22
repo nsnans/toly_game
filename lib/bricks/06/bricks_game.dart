@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/image_composition.dart';
@@ -38,12 +39,12 @@ class BricksGame extends FlameGame<PlayWorld>
     with KeyboardEvents, HasCollisionDetection {
   BricksGame()
       : super(
-          camera: CameraComponent.withFixedResolution(
-            width: kViewPort.width,
-            height: kViewPort.height,
-          ),
-          world: PlayWorld(),
-        );
+    camera: CameraComponent.withFixedResolution(
+      width: kViewPort.width,
+      height: kViewPort.height,
+    ),
+    world: PlayWorld(),
+  );
 
   PaddleType get paddleType => configManager.config.paddleType;
 
@@ -53,17 +54,18 @@ class BricksGame extends FlameGame<PlayWorld>
     world.paddle.switchType(src);
   }
 
-  List<PaddleType> get buyPaddles => configManager.config.activePaddles
-      .map((e) => PaddleType.values[e])
-      .toList();
+  List<PaddleType> get buyPaddles =>
+      configManager.config.activePaddles
+          .map((e) => PaddleType.values[e])
+          .toList();
 
-  List<String> get buyPaddleSrcs => buyPaddles
-      .map((e) =>e.src)
-      .toList();
+  List<String> get buyPaddleSrcs => buyPaddles.map((e) => e.src).toList();
 
   List<Goods> get buyPaddleGoods =>
-      goodsManager.goods(GoodsType.paddle)
-      .where((e) => buyPaddleSrcs.contains(e.src)).toList();
+      goodsManager
+          .goods(GoodsType.paddle)
+          .where((e) => buyPaddleSrcs.contains(e.src))
+          .toList();
 
   TextureLoader loader = TextureLoader();
   GoodsManager goodsManager = GoodsManager();
@@ -147,8 +149,8 @@ class BricksGame extends FlameGame<PlayWorld>
   final double moveStep = 40;
 
   @override
-  KeyEventResult onKeyEvent(
-      KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(KeyEvent event,
+      Set<LogicalKeyboardKey> keysPressed) {
     super.onKeyEvent(event, keysPressed);
     if (event is KeyDownEvent || event is KeyRepeatEvent) {
       if (status == GameStatus.ready) KeyEventResult.handled;
@@ -164,21 +166,54 @@ class BricksGame extends FlameGame<PlayWorld>
   }
 
   void getCoin() {
-      configManager.addCoin();
-      world.titleBar.coin.updateCoin();
+    configManager.addCoin();
+    world.titleBar.coin.updateCoin();
   }
 
-
   void buy(Goods goods) {
-    if(goods.type==GoodsType.paddle){
+    if (goods.type == GoodsType.paddle) {
       String src = goods.src;
-      PaddleType type = PaddleType.values.singleWhere((e) => e.src==src);
+      PaddleType type = PaddleType.values.singleWhere((e) => e.src == src);
       configManager.buyPaddleSuccess(type);
-    }else{
+    } else {
       configManager.saveGoodsToPackage(goods);
     }
-    configManager.addCoin(count: -(goods.coin??0));
+    configManager.addCoin(count: -(goods.coin ?? 0));
     world.titleBar.coin.updateCoin();
+  }
+
+  bool get hasHomePage => overlays.isActive('HomePage');
+
+  void useGoods(Goods goods) async{
+    configManager.useGoodsInPackage(goods);
+
+    if (goods.type == GoodsType.rune) {
+      //减少道具数
+      //击碎砖块
+      List<Brick> bricks = world.brickManager.children
+          .whereType<Brick>()
+          .where((b) => b.src == goods.src)
+          .toList();
+      for (Brick brick in bricks) {
+        world.onBrickWillRemove(brick);
+      }
+    }
+
+    if(goods.type==GoodsType.function){
+      if(goods.src=='prop_show_5s.png'){
+        world.propManager.priority = 10;
+        await Future.delayed(const Duration(seconds: 3));
+        world.propManager.priority = 0;
+      }
+      
+      if(goods.src=='prop_random.png'){
+        int index = random.nextInt(Prop.values.length);
+        PropComponent prop = PropComponent(Prop.values[index]);
+        prop.position = Vector2(kViewPort.width/2, 300);
+        world.add(prop);
+        prop.fall();
+      }
+    }
   }
 }
 
@@ -222,10 +257,15 @@ class PlayWorld extends World
 
   /// 是否处于 无敌状态
   bool get isInvincible =>
-      displays.where((e) => e.prop == Prop.invincible).isNotEmpty;
+      displays
+          .where((e) => e.prop == Prop.invincible)
+          .isNotEmpty;
 
   /// 是否处于 射击状态
-  bool get isShoot => displays.where((e) => e.prop == Prop.shoot).isNotEmpty;
+  bool get isShoot =>
+      displays
+          .where((e) => e.prop == Prop.shoot)
+          .isNotEmpty;
 
   List<PropDisplay> get displays => children.whereType<PropDisplay>().toList();
 
@@ -295,6 +335,11 @@ class PlayWorld extends World
       List<Ball> balls = children.whereType<Ball>().toList();
       if (balls.isNotEmpty) {
         balls.first.run();
+        if (game.paddleType == PaddleType.azure) {
+          Future.delayed(const Duration(milliseconds: 200)).then((value) {
+            addBall(autoPlay: true);
+          });
+        }
         game.status = GameStatus.playing;
       }
     }
@@ -325,16 +370,59 @@ class PlayWorld extends World
   }
 
   void createCoin(Vector2 position) {
-    if (game.probability(0.20)) {
+    double probability = 0.20;
+    if (game.paddleType == PaddleType.yellow) {
+      probability += 0.1;
+    }
+    if (game.probability(probability)) {
       CoinComponent coin = CoinComponent(position: position);
       add(coin);
     }
   }
 
+  int _breakCount = 0;
+
   void onBrickWillRemove(Brick brick) {
+    _breakCount++;
+    if (_breakCount == 10) {
+      handlePaddleEffect(brick);
+      _breakCount = 0;
+    }
     brick.removeFromParent();
     propManager.fallOrNot(brick.id);
     createCoin(brick.absolutePosition + brick.size / 2);
     game.am.play(SoundEffect.uiSelect);
+  }
+
+  void handlePaddleEffect(Brick brick) async {
+    if (game.paddleType == PaddleType.blue) {
+      List<Brick> bricks = brickManager.children
+          .whereType<Brick>()
+          .where((b) => b.column == brick.column)
+          .toList();
+      for (Brick brick in bricks) {
+        onBrickWillRemove(brick);
+      }
+    }
+
+    if (game.paddleType == PaddleType.red) {
+      List<Brick> bricks = brickManager.children
+          .whereType<Brick>()
+          .where((b) => b.row == brick.row)
+          .toList();
+      for (Brick brick in bricks) {
+        onBrickWillRemove(brick);
+      }
+    }
+
+    if (game.paddleType == PaddleType.purple) {
+      Vector2 position = brick.absolutePosition + brick.size / 2;
+      await Future.delayed(const Duration(milliseconds: 100));
+      int index = game.random.nextInt(Prop.values.length);
+      PropComponent prop = PropComponent(Prop.values[index]);
+      prop.position = position;
+      add(prop);
+      prop.fall();
+    }
   }
 }

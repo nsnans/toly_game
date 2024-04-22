@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:path/path.dart' as path;
 
+typedef LoadProgressCallBack = void Function(int total, int cur);
+
 class TextureLoader {
   final List<Frame> _frames = [];
   late final Image _sprites;
@@ -20,20 +22,38 @@ class TextureLoader {
     }
   }
 
-  Future<void> load(String jsonAsset, String imageAsset,{List<String> extra=const []}) async {
-    await _initStaticSprites(extra);
+  Future<void> load(
+    String jsonAsset,
+    String imageAsset, {
+    List<String> extra = const [],
+    LoadProgressCallBack? loadingCallBack,
+  }) async {
+    int total = extra.length+3;
+    int cur = 0;
+    List<String> images = extra;
+    for (int i = 0; i < images.length; i++) {
+      String filename = path.basename(images[i]);
+      _staticSpriteMap[filename] = await Sprite.load(images[i]);
+      cur++;
+      loadingCallBack?.call(total,cur);
+    }
     _frames.clear();
     String data = await rootBundle.loadString(jsonAsset);
+    cur++;
+    loadingCallBack?.call(total,cur);
     List<dynamic> textures = json.decode(data)['textures'];
+
     for (int i = 0; i < textures.length; i++) {
       dynamic texture = textures[i];
       _frames.addAll((texture['frames'] as List).map(Frame.fromMap));
     }
     _sprites = await Flame.images.load(imageAsset);
+    cur++;
+    loadingCallBack?.call(total,cur);
   }
 
   Sprite operator [](String name) {
-    if(_staticSpriteMap.containsKey(name)){
+    if (_staticSpriteMap.containsKey(name)) {
       return _staticSpriteMap[name]!;
     }
 

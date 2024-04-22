@@ -1,11 +1,12 @@
-import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 
-import 'trex/06/trex_game.dart';
+import 'bricks/07/app.dart';
 import 'utils/size_utils.dart';
 
 main() {
-  runApp(GameWidget(game: TrexGame()));
+  runApp(const TolyGameApp());
+  SizeUtils.setSize(size: const Size(360, 360 * 2400 / 1080 + 30 - 18));
+
   SizeUtils.fullScreenMobile();
 }
 

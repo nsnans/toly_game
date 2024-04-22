@@ -55,7 +55,7 @@ class GameConfig {
       blueCrystal: map['blueCrystal'] ?? 0,
       coin: map['coin'] ?? 0,
       activePaddles:
-          map['activePaddles'].map<int>((e) => e as int).toList() ?? [5],
+          map['activePaddles']?.map<int>((e) => e as int).toList() ?? [5],
       paddleType: PaddleType.values[map['paddleType'] ?? 5],
       enableSoundEffect: map['enableSoundEffect'] ?? true,
       enableBgMusic: map['enableBgMusic'] ?? true,

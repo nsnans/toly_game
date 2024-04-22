@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'platform_adapter/window/windows_adapter.dart';
@@ -17,6 +18,8 @@ class SizeUtils {
   }
 
   static void fullScreenMobile() {
+    if(kIsWeb) return;
+
     if (Platform.isAndroid || Platform.isIOS) {
       // 强制横屏
       // SystemChrome.setPreferredOrientations(

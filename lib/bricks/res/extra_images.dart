@@ -51,7 +51,22 @@ List<String> get extraImages {
     'break_bricks/package_panel.png',
     'break_bricks/package_cell.png',
     'break_bricks/package_tab.png',
+    'break_bricks/loading.png',
+    'break_bricks/bg_gallery.png',
   ];
+
+  for(int i=1;i<=14;i++){
+    result.add('break_bricks/boom/TCSY_000${i.toString().padLeft(2,'0')}.png');
+  }
+
+  for(int i=1;i<=4;i++){
+    result.add('break_bricks/bottom/lightning${i.toString().padLeft(2,'0')}.png');
+  }
+
+  for(int i=1;i<=12;i++){
+    result.add('break_bricks/died/died_${i.toString().padLeft(4,'0')}.png');
+  }
+
   result.addAll(Prop.values.map((e) => 'break_bricks/${e.src}'));
   return result;
 }
