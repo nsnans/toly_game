@@ -22,25 +22,38 @@ class TextureLoader {
     }
   }
 
+  Future<void> loadImages(List<String> images ,{
+    LoadProgressCallBack? loadingCallBack,
+  }) async{
+    int total = images.length;
+    int cur = 0;
+    for (int i = 0; i < images.length; i++) {
+      String filename = path.basename(images[i]);
+      _staticSpriteMap[filename] = await Sprite.load(images[i]);
+      cur++;
+      loadingCallBack?.call(total, cur);
+    }
+  }
+
   Future<void> load(
     String jsonAsset,
     String imageAsset, {
     List<String> extra = const [],
     LoadProgressCallBack? loadingCallBack,
   }) async {
-    int total = extra.length+3;
+    int total = extra.length + 3;
     int cur = 0;
     List<String> images = extra;
     for (int i = 0; i < images.length; i++) {
       String filename = path.basename(images[i]);
       _staticSpriteMap[filename] = await Sprite.load(images[i]);
       cur++;
-      loadingCallBack?.call(total,cur);
+      loadingCallBack?.call(total, cur);
     }
     _frames.clear();
     String data = await rootBundle.loadString(jsonAsset);
     cur++;
-    loadingCallBack?.call(total,cur);
+    loadingCallBack?.call(total, cur);
     List<dynamic> textures = json.decode(data)['textures'];
 
     for (int i = 0; i < textures.length; i++) {
@@ -49,7 +62,7 @@ class TextureLoader {
     }
     _sprites = await Flame.images.load(imageAsset);
     cur++;
-    loadingCallBack?.call(total,cur);
+    loadingCallBack?.call(total, cur);
   }
 
   Sprite operator [](String name) {

@@ -46,6 +46,7 @@ flutter:
     - assets/images/demos/
     - assets/images/trex/
     - assets/images/break_bricks/
+    - assets/images/sweeper/
     - assets/images/break_bricks/boom/
     - assets/images/break_bricks/bottom/
     - assets/images/break_bricks/died/
