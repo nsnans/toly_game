@@ -6,5 +6,5 @@ import 'app/sweeper_app.dart';
 
 main() {
   runApp(const SweeperApp());
-  SizeUtils.setSize(size: const Size( 360 * 2400 / 1080 + 30 - 18,360));
+  SizeUtils.setSize(size: const Size( 800,600));
 }

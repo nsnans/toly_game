@@ -2,9 +2,12 @@ import 'dart:convert';
 
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
+import 'package:flame_svg/flame_svg.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:path/path.dart' as path;
+
+import 'exception/assets.dart';
 
 typedef LoadProgressCallBack = void Function(int total, int cur);
 
@@ -13,6 +16,7 @@ class TextureLoader {
   late final Image _sprites;
 
   final Map<String, Sprite> _staticSpriteMap = {};
+  final Map<String, Svg> _svgMap = {};
 
   Future<void> _initStaticSprites(List<String> extra) async {
     List<String> images = extra;
@@ -30,6 +34,19 @@ class TextureLoader {
     for (int i = 0; i < images.length; i++) {
       String filename = path.basename(images[i]);
       _staticSpriteMap[filename] = await Sprite.load(images[i]);
+      cur++;
+      loadingCallBack?.call(total, cur);
+    }
+  }
+
+  Future<void> loadSvg(List<String> images ,{
+    LoadProgressCallBack? loadingCallBack,
+  }) async{
+    int total = images.length;
+    int cur = 0;
+    for (int i = 0; i < images.length; i++) {
+      String filename = path.basename(images[i]);
+      _svgMap[filename] = await Svg.load(images[i]);
       cur++;
       loadingCallBack?.call(total, cur);
     }
@@ -77,6 +94,15 @@ class TextureLoader {
       srcSize: frame.sourceSize,
     );
   }
+
+
+  Svg findSvg(String name) {
+    if (_svgMap.containsKey(name)) {
+      return _svgMap[name]!;
+    }
+    throw AssetsNotFindException(name);
+  }
+
 }
 
 class Frame {
