@@ -7,38 +7,40 @@ import 'package:flame_ext/flame_ext.dart';
 import 'package:flutter/material.dart';
 import '../app/res/extra_images.dart';
 import 'logic/game_face_logic.dart';
+import 'logic/game_hud_logic.dart';
+import 'logic/game_state_logic.dart';
+import 'model/game_state.dart';
 import 'sweeper_world.dart';
 import 'config/size_res.dart';
-// const Size kViewPort = Size( 16*36 ,16*36,);
 
-class SweeperGame extends FlameGame<SweeperWorld> with GameFaceLogic{
+class SweeperGame extends FlameGame<SweeperWorld>
+    with GameFaceLogic, GameHudLogic {
+  SweeperGame() : super(world: SweeperWorld());
 
-  SweeperGame():super(world: SweeperWorld());
-
-  SizeRes sizeRes = SizeRes();
+  late SizeRes sizeRes = SizeRes(gridXY: state.mode.size);
   TextureLoader loader = TextureLoader();
 
-
+  late GameStateLogic state = GameStateLogic(const GameMode.middle(), this);
 
   @override
-  FutureOr<void> onLoad() async{
-
+  FutureOr<void> onLoad() async {
     camera.viewfinder.anchor = Anchor.topLeft;
-    // camera.moveTo(Vector2(-(width-cellSize*gridSize.$1)/2, 0));
-   await loader.loadImages(extraImages);
-   await loader.loadSvg(extraSvg);
-    add(FpsTextComponent(
-      textRenderer: TextPaint(
-        style: const TextStyle(fontSize: 16,color: Colors.black)
-      )
-    )..x=20..y=20);
-
+    await loader.loadSvg(extraSvg);
+    changeMineCount(state.mode.mineCount);
     return super.onLoad();
   }
 
-  @override
-  Color backgroundColor() {
+  void changeMode(GameMode mode){
+    state = GameStateLogic(mode, this);
+    sizeRes = SizeRes(gridXY: state.mode.size);
+    restart();
+  }
 
-    return Color(0xfff7f7f0);
+  @override
+  Color backgroundColor() => const Color(0xfff7f7f0);
+
+  void restart() {
+    state.reset();
+    world = SweeperWorld();
   }
 }

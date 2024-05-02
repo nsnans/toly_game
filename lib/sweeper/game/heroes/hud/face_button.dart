@@ -1,12 +1,15 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame_svg/flame_svg.dart';
-import 'package:toly_game/sweeper/game/sweeper_game.dart';
 
-class FaceButton extends SvgComponent with HasGameRef<SweeperGame>,TapCallbacks {
+
+import '../../model/types.dart';
+import '../../sweeper_game.dart';
+
+class FaceButton extends SvgComponent
+    with HasGameRef<SweeperGame>, TapCallbacks {
   @override
   FutureOr<void> onLoad() {
     size = game.sizeRes.faceSize;
@@ -14,12 +17,12 @@ class FaceButton extends SvgComponent with HasGameRef<SweeperGame>,TapCallbacks 
     return super.onLoad();
   }
 
-  StreamSubscription<bool>? _subscription;
+  StreamSubscription<FaceType>? _subscription;
 
   @override
   void onMount() {
     super.onMount();
-    _subscription =  game.faceStream.listen(_onFaceChange);
+    _subscription = game.faceStream.listen(_onFaceChange);
   }
 
   @override
@@ -38,25 +41,29 @@ class FaceButton extends SvgComponent with HasGameRef<SweeperGame>,TapCallbacks 
     pressed();
   }
 
-@override
+  @override
   void onTapUp(TapUpEvent event) {
     super.onTapUp(event);
     reset();
+
   }
 
-  void active(){
+  @override
+  void onTapCancel(TapCancelEvent event) {
+    super.onTapCancel(event);
+    reset();
+  }
+
+  void active() {
     svg = game.loader.findSvg('face_active.svg');
   }
 
   void reset() {
     svg = game.loader.findSvg('face.svg');
+    game.restart();
   }
 
-  void _onFaceChange(bool value) {
-    if(value){
-      active();
-    }else{
-      reset();
-    }
+  void _onFaceChange(FaceType value) {
+    svg = game.loader.findSvg(value.key);
   }
 }

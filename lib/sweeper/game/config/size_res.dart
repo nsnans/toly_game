@@ -26,7 +26,7 @@ class SizeRes {
         gridSize.y + hudSize.y + gap * 3,
       );
 
-  double get gap => 0.72 * cellSize;
+  double get gap => 0.618 * cellSize;
 
   double get ledSpace => cellSize * 0.12;
 

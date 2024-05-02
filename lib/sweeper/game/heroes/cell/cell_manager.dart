@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:toly_game/sweeper/game/logic/game_cell_logic.dart';
-import 'package:toly_game/sweeper/game/sweeper_game.dart';
 
+
+import '../../logic/game_cell_logic.dart';
+import '../../sweeper_game.dart';
 import 'cell.dart';
 
 class CellManager extends PositionComponent
-    with HasGameRef<SweeperGame>, DragCallbacks,TapCallbacks, GameCellLogic {
+    with HasGameRef<SweeperGame>, DragCallbacks,TapCallbacks,GameCellLogic {
   @override
   FutureOr<void> onLoad() {
     size = game.sizeRes.gridSize;
@@ -33,4 +34,6 @@ class CellManager extends PositionComponent
     }
     return result;
   }
+
+
 }

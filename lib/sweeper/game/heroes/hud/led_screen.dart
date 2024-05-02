@@ -5,8 +5,9 @@ import 'package:flame/components.dart';
 import 'package:flame_svg/flame_svg.dart';
 import 'package:flutter/material.dart';
 
-import '../../../painter/decration/border_decroation.dart';
+import '../../../painter/decoration/border_decoration.dart';
 import '../../config/color_res.dart';
+import '../../model/types.dart';
 import '../../sweeper_game.dart';
 
 class LedScreen extends PositionComponent with HasGameRef<SweeperGame> {
@@ -48,8 +49,14 @@ class LedScreen extends PositionComponent with HasGameRef<SweeperGame> {
 
   int _value = 0;
 
-  void set value(int value) {
+  set value(int value) {
     _value = value;
+    List<SvgComponent> lamps = children.whereType<SvgComponent>().toList();
+    String valueStr = _value.toString().padLeft(count,'0');
+    for(int i=0;i<lamps.length;i++){
+      String key = DigitalType.values[int.tryParse(valueStr[i])??0].key;
+      lamps[i].svg =  game.loader.findSvg(key);
+    }
   }
 
   void setLed() {}

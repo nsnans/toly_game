@@ -1,17 +1,27 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
-import '../../painter/decration/border_decroation.dart';
+
+import '../../painter/decoration/border_decoration.dart';
 import '../config/color_res.dart';
 import '../sweeper_game.dart';
-import 'cell/cell.dart';
+
 import 'cell/cell_manager.dart';
+import 'text/help_text.dart';
 import 'hud/sweeper_hud.dart';
+import 'text/sweep_text_button.dart';
 
 class SweeperLayout extends PositionComponent with HasGameRef<SweeperGame> {
+  HelpText helpText = HelpText();
+
+  FpsTextComponent fps = (FpsTextComponent(
+    anchor:  const Anchor(1, 0),
+      textRenderer: TextPaint(
+    style: const TextStyle(fontSize: 12, color: Color(0xff808080)),
+  )));
+
   @override
   void onGameResize(Vector2 size) {
     x = (size.x - width) / 2;
@@ -23,10 +33,17 @@ class SweeperLayout extends PositionComponent with HasGameRef<SweeperGame> {
   FutureOr<void> onLoad() {
     size = game.sizeRes.layoutSize;
     double gap = game.sizeRes.gap;
+    // add(SweepButtons());
     SweeperHud hud = SweeperHud()..position = Vector2(gap, gap);
-    //
     add(hud);
-    add(CellManager());
+    CellManager manager = CellManager();
+    add(manager);
+
+    // add(helpText..position = Vector2(x, height + 6));
+    // add(fps);
+
+
+    fps.position = Vector2(width, height + 8);
     return super.onLoad();
   }
 
@@ -36,7 +53,7 @@ class SweeperLayout extends PositionComponent with HasGameRef<SweeperGame> {
     canvas.drawRect(rect, Paint()..color = ColorRes.background);
     _pintHudBorder(canvas);
     _paintGridBorder(canvas);
-    _paintOutBorder(canvas,rect);
+    _paintOutBorder(canvas, rect);
     super.render(canvas);
   }
 
@@ -64,7 +81,7 @@ class SweeperLayout extends PositionComponent with HasGameRef<SweeperGame> {
     decoration.paint(game.sizeRes.gridRect, canvas);
   }
 
-  void _paintOutBorder(Canvas canvas,Rect rect) {
+  void _paintOutBorder(Canvas canvas, Rect rect) {
     double strokeWidth = game.sizeRes.gap * 0.25;
     BorderDecoration decoration = BorderDecoration(
       strokeWidth: strokeWidth,
@@ -75,5 +92,4 @@ class SweeperLayout extends PositionComponent with HasGameRef<SweeperGame> {
     );
     decoration.paint(rect, canvas);
   }
-
 }

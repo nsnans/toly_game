@@ -67,7 +67,7 @@ class Toast {
     toast(msg, color:Colors.orange, );
   }
 
-  static  void success(BuildContext context,String msg){
+  static  void success(String msg){
     toast(msg, color:Colors.green, );
   }
 

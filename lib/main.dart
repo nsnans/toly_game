@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:oktoast/oktoast.dart';
 
-import 'bricks/07/app.dart';
-import 'utils/size_utils.dart';
+import '../utils/size_utils.dart';
+import 'sweeper/app/sweeper_app.dart';
 
 main() {
-  runApp(const TolyGameApp());
-  SizeUtils.setSize(size: const Size(360, 360 * 2400 / 1080 + 30 - 18));
-
-  SizeUtils.fullScreenMobile();
+  runApp(OKToast(child: const SweeperApp()));
+  SizeUtils.setSize(size: const Size( 800,600));
 }
-
-

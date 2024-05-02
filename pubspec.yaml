@@ -19,6 +19,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flame_svg: ^1.10.1
   flame_forge2d: ^0.16.0+5
+  flutter_svg: ^2.0.10+1
   window_manager: ^0.3.8      # 桌面管理
 #  web: ^0.5.1
   flame_ext:

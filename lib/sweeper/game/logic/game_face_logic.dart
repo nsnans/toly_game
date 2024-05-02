@@ -1,21 +1,19 @@
 import 'dart:async';
 
+import '../model/types.dart';
+
+
 mixin GameFaceLogic{
-  bool _isActive = false;
+  FaceType _faceType = FaceType.common;
 
-  final StreamController<bool> _faceCtrl = StreamController.broadcast();
+  final StreamController<FaceType> _faceCtrl = StreamController.broadcast();
 
-  Stream<bool> get faceStream => _faceCtrl.stream;
+  Stream<FaceType> get faceStream => _faceCtrl.stream;
 
-  void activeFace(){
-    if(_isActive) return;
-    _faceCtrl.add(true);
-    _isActive = true;
-  }
-
-  void resetFace(){
-    if(!_isActive) return;
-    _faceCtrl.add(false);
-    _isActive = false;
+  void emit(FaceType faceType){
+    if(_faceType==faceType) return;
+    _faceCtrl.add(faceType);
+    _faceType= faceType;
   }
 }
+
