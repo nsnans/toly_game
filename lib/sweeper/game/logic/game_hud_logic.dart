@@ -1,7 +1,6 @@
 import 'dart:async';
 
-mixin GameHudLogic {
-
+mixin GameHudLogic{
   final StreamController<int> _mineCountCtrl = StreamController.broadcast();
 
   final StreamController<int> _timeCountCtrl = StreamController.broadcast();
@@ -25,7 +24,6 @@ mixin GameHudLogic {
   void _updateTime(Timer timer) {
     _timeCount++;
     _timeCountCtrl.add(_timeCount);
-    // print("========_updateTime:${_timeCount}===============");
   }
 
   void closeTimer() {

@@ -1,88 +1,104 @@
+import 'dart:async';
 import 'dart:math';
+
+import 'package:toly_game/sweeper/game/logic/game_hud_logic.dart';
 
 import '../../../utils/toast.dart';
 import '../model/game_state.dart';
-import 'game_hud_logic.dart';
 import '../model/types.dart';
+import 'game_face_logic.dart';
 
-class GameStateLogic {
-  final GameMode mode;
-
-  final GameHudLogic logic;
-
-  GameStateLogic(this.mode, this.logic);
-
+mixin GameStateLogic on GameHudLogic, GameFaceLogic{
+  /// 游戏模式
+  GameMode mode = const GameMode.middle();
+  /// 游戏状态
   GameStatus _status = GameStatus.ready;
 
-  final Random _random = Random();
-
+  /// 地图数据
+  Map<XY, CellType> cells = {};
+  /// 已打开点集
   final List<XY> _openPos = [];
+  /// 已标记点集
   final List<XY> _markPos = [];
 
+  /// 随机数
+  final Random _random = Random();
+
+  set status(value){
+    _status = value;
+    switch(_status){
+      case GameStatus.ready:
+      case GameStatus.died:
+      case GameStatus.win:
+        closeTimer();
+        break;
+      case GameStatus.playing:
+        startTimer();
+    }
+  }
+
   void lose() {
-    _status = GameStatus.died;
-    logic.closeTimer();
+    status = GameStatus.died;
+    emit(FaceType.lose);
   }
 
   bool get disable => _status == GameStatus.died || _status == GameStatus.win;
 
-  bool isMarked(XY pos) {
-    return _markPos.contains(pos);
-  }
-
-  bool get isWin {
-    //胜利条件
-    return _openPos.length == mode.row * mode.column - mode.mineCount;
-  }
-
   int get ledMineCount => mode.mineCount - _markPos.length;
 
   void reset() {
-    _status = GameStatus.ready;
-    logic.closeTimer();
+    status = GameStatus.ready;
     _openPos.clear();
     _markPos.clear();
     cells.clear();
   }
 
-  bool isOpen(XY pos) {
-    return _openPos.contains(pos);
-  }
 
-  bool allowOutOpen(XY pos) {
-    return !isOpen(pos) && !isMarked(pos);
+  bool allowAutoOpen(XY pos) {
+    return !isOpened(pos) && !isMarked(pos);
   }
 
   void initMapOrNot(XY pos) {
     if (_openPos.isEmpty) {
-      _status = GameStatus.playing;
-      logic.startTimer();
-      _createMine(pos, mode.row, mode.column);
-      _createCellValue();
+      status = GameStatus.playing;
+      int row = mode.row;
+      int column = mode.column;
+      _createMine(pos, row, column,mode.mineCount);
+      _createCellValue( row, column);
     }
   }
 
-  bool open(XY pos) {
+  void open(XY pos) {
     _openPos.add(pos);
     checkWinGame();
-    return isWin;
+  }
+
+  bool isOpened(XY pos) => _openPos.contains(pos);
+
+  bool get isWin {
+    return _openPos.length == mode.row * mode.column - mode.mineCount;
   }
 
   void checkWinGame() {
     if (isWin) {
       Toast.success('恭喜胜利');
-      _status = GameStatus.win;
-      logic.closeTimer();
+      status = GameStatus.win;
     }
   }
 
   void mark(XY pos) {
     _markPos.add(pos);
+    changeMineCount(ledMineCount);
   }
 
-  Map<XY, CellType> cells = {};
+  void unMark(XY pos) {
+    _markPos.remove(pos);
+    changeMineCount(ledMineCount);
+  }
 
-  void _createMine(XY pos, int row, int column) {
+  bool isMarked(XY pos) => _markPos.contains(pos);
+
+  void _createMine(XY pos, int row, int column,int mineCount) {
     List<XY> posPool = [];
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < column; j++) {
@@ -91,7 +107,7 @@ class GameStateLogic {
         }
       }
     }
-    while (cells.length < mode.mineCount) {
+    while (cells.length < mineCount) {
       int index = _random.nextInt(posPool.length);
       XY target = posPool[index];
       cells[target] = CellType.mine;
@@ -99,30 +115,24 @@ class GameStateLogic {
     }
   }
 
-  void _createCellValue() {
-    int row = mode.row;
-    int column = mode.column;
+  void _createCellValue(int row, int column) {
     for (int y = 0; y < row; y++) {
       for (int x = 0; x < column; x++) {
         if (cells[(x, y)] != CellType.mine) {
-          int count = _calculate(x, y, row, column);
+          int count = _calculate(x, y);
           cells[(x, y)] = CellType.values[count];
         }
       }
     }
   }
 
-  int _calculate(int x, int y, int row, int column) {
+  int _calculate(int x, int y) {
     int count = 0;
-    for (int i = max(0, y - 1); i <= min(row - 1, y + 1); i++) {
-      for (int j = max(0, x - 1); j <= min(column - 1, x + 1); j++) {
+    for (int i =  y - 1; i <= y + 1; i++) {
+      for (int j =  x - 1; j <= x + 1; j++) {
         if (cells[(j, i)] == CellType.mine) count++;
       }
     }
     return count;
-  }
-
-  void unMark((int, int) pos) {
-    _markPos.remove(pos);
   }
 }

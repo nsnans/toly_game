@@ -22,9 +22,9 @@ class LedScreen extends PositionComponent with HasGameRef<SweeperGame> {
   });
 
   Vector2 get screenSize => Vector2(
-    ledWidth * count + (count-1) * ledSpace+2*ledSpace,
-    ledWidth * 2 + ledSpace,
-  );
+        ledWidth * count + (count - 1) * ledSpace + 2 * ledSpace,
+        ledWidth * 2 + ledSpace,
+      );
 
   @override
   FutureOr<void> onLoad() {
@@ -52,10 +52,10 @@ class LedScreen extends PositionComponent with HasGameRef<SweeperGame> {
   set value(int value) {
     _value = value;
     List<SvgComponent> lamps = children.whereType<SvgComponent>().toList();
-    String valueStr = _value.toString().padLeft(count,'0');
-    for(int i=0;i<lamps.length;i++){
-      String key = DigitalType.values[int.tryParse(valueStr[i])??0].key;
-      lamps[i].svg =  game.loader.findSvg(key);
+    String valueStr = _value.toString().padLeft(count, '0');
+    for (int i = 0; i < lamps.length; i++) {
+      String key = DigitalType.values[int.tryParse(valueStr[i]) ?? 0].key;
+      lamps[i].svg = game.loader.findSvg(key);
     }
   }
 

@@ -28,30 +28,25 @@ class Cell extends SvgComponent with HasGameRef<SweeperGame> {
 
   void mark() {
     svg = game.loader.findSvg('flag.svg');
-    game.state.mark(pos);
-    game.changeMineCount(game.state.ledMineCount);
   }
 
   void unMark() {
     reset();
-    game.state.unMark(pos);
-    game.changeMineCount(game.state.ledMineCount);
-
   }
 
   void open() {
-    CellType? type = game.state.cells[pos];
+    CellType? type = game.cells[pos];
     if (type != null) {
       svg = game.loader.findSvg(type.key);
-      game.state.open(pos);
+      game.open(pos);
     }
   }
 
-  void openMind() {
-    CellType? type = game.state.cells[pos];
+  void openMine() {
+    CellType? type = game.cells[pos];
     if (type != null&&type==CellType.mine) {
       svg = game.loader.findSvg(type.key);
-      game.state.open(pos);
+      game.open(pos);
     }
   }
 

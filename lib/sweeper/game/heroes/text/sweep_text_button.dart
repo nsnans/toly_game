@@ -78,7 +78,7 @@ class SweepTextButton extends PositionComponent with HasGameRef<SweeperGame>, Ta
     super.onTapDown(event);
   }
 
-  bool get active => game.state.mode.mode.index==id;
+  bool get active => game.mode.mode.index==id;
   Color get bgColor => active?Colors.blue: const Color(0xffc0c0c0);
 
   @override

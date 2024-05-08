@@ -23,9 +23,11 @@ class SweeperHud extends PositionComponent with HasGameRef<SweeperGame> {
   void _onMineCountChange(int event) {
     leftScreen.value = event;
   }
+
   void _onTimerChange(int event) {
     rightScreen.value = event;
   }
+
   @override
   void onRemove() {
     _mineSubscription?.cancel();
@@ -41,7 +43,7 @@ class SweeperHud extends PositionComponent with HasGameRef<SweeperGame> {
     double faceX = (width - game.sizeRes.faceSize.x) / 2;
     add(FaceButton()..position = Vector2(faceX, faceY));
 
-    leftScreen.value = game.state.ledMineCount;
+    leftScreen.value = game.ledMineCount;
 
     return super.onLoad();
   }

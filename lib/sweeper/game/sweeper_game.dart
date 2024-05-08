@@ -14,25 +14,26 @@ import 'sweeper_world.dart';
 import 'config/size_res.dart';
 
 class SweeperGame extends FlameGame<SweeperWorld>
-    with GameFaceLogic, GameHudLogic {
+    with GameFaceLogic, GameHudLogic, GameStateLogic {
   SweeperGame() : super(world: SweeperWorld());
 
-  late SizeRes sizeRes = SizeRes(gridXY: state.mode.size);
+  late SizeRes sizeRes = SizeRes(gridXY: mode.size);
   TextureLoader loader = TextureLoader();
 
-  late GameStateLogic state = GameStateLogic(const GameMode.middle(), this);
+
 
   @override
   FutureOr<void> onLoad() async {
     camera.viewfinder.anchor = Anchor.topLeft;
     await loader.loadSvg(extraSvg);
-    changeMineCount(state.mode.mineCount);
+    changeMineCount(mode.mineCount);
     return super.onLoad();
   }
 
   void changeMode(GameMode mode){
-    state = GameStateLogic(mode, this);
-    sizeRes = SizeRes(gridXY: state.mode.size);
+    // state = GameStateLogic(mode, this);
+    this.mode = mode;
+    sizeRes = SizeRes(gridXY: mode.size);
     restart();
   }
 
@@ -40,7 +41,7 @@ class SweeperGame extends FlameGame<SweeperWorld>
   Color backgroundColor() => const Color(0xfff7f7f0);
 
   void restart() {
-    state.reset();
+    reset();
     world = SweeperWorld();
   }
 }

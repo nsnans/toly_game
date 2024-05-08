@@ -33,7 +33,7 @@ class SweeperLayout extends PositionComponent with HasGameRef<SweeperGame> {
   FutureOr<void> onLoad() {
     size = game.sizeRes.layoutSize;
     double gap = game.sizeRes.gap;
-    // add(SweepButtons());
+    add(SweepButtons());
     SweeperHud hud = SweeperHud()..position = Vector2(gap, gap);
     add(hud);
     CellManager manager = CellManager();

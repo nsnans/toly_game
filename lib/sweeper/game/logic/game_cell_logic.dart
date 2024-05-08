@@ -20,13 +20,14 @@ mixin GameCellLogic on DragCallbacks, TapCallbacks, HasGameRef<SweeperGame> {
 
   @override
   void onLongTapDown(TapDownEvent event) {
-    if (game.state.disable) return;
+    if (game.disable) return;
     print("========onLongTapDown=============");
     XY pos = trans(event.localPosition);
-    if (game.state.isOpen(pos)) return;
+    if (game.isOpened(pos)) return;
     Cell? cell = activeCell(pos);
     if (cell != null) {
       cell.mark();
+      game.mark(pos);
       unpressed();
     }
     super.onLongTapDown(event);
@@ -72,73 +73,76 @@ mixin GameCellLogic on DragCallbacks, TapCallbacks, HasGameRef<SweeperGame> {
   }
 
   void open() {
-    if (game.state.disable) return;
+    if (game.disable) return;
     if (_pressedCells.isNotEmpty) {
       Cell cell = _pressedCells.first;
-      if (game.state.isMarked(cell.pos)) {
-        cell.reset();
-        return;
-      }
-      game.state.initMapOrNot(cell.pos);
-      _debugOpenAll();
-      CellType? type = game.state.cells[cell.pos];
-      if (type == CellType.mine) {
-        died(cell);
-      } else {
-        cell.open();
-        handleAutoOpen(cell.pos);
-      }
+      if (_handelMark(cell)) return;
+      game.initMapOrNot(cell.pos);
+      _handleOpenCell(cell);
       _pressedCells.clear();
     }
     unpressed();
   }
 
-  void died(Cell cell) {
-    game.emit(FaceType.lose);
-    game.state.lose();
+  bool _handelMark(Cell cell) {
+    if (game.isMarked(cell.pos)) {
+      cell.unMark();
+      game.unMark(cell.pos);
+      return true;
+    }
+    return false;
+  }
+
+  void _handleOpenCell(Cell cell) {
+    CellType? type = game.cells[cell.pos];
+    if (type == CellType.mine) {
+      gameOver(cell);
+    } else {
+      cell.open();
+      handleAutoOpen(type, cell.pos);
+    }
+  }
+
+  void gameOver(Cell cell) {
+    game.lose();
     Iterable<Cell> cells = children.whereType<Cell>();
     for (Cell cell in cells) {
-      cell.openMind();
+      cell.openMine();
     }
     cell.died();
   }
 
-  void autoOpenAt((int, int) pos) {
+  void autoOpenAt(XY pos) {
+    if(!game.allowAutoOpen(pos)) return;
     Cell? cell = activeCell(pos);
     if (cell != null) {
-      CellType? type = game.state.cells[pos];
+      CellType? type = game.cells[pos];
       if (type != CellType.mine) {
         cell.open();
-        handleAutoOpen(pos);
+        handleAutoOpen(type, pos);
       }
     }
   }
 
-  void handleAutoOpen((int, int) pos) {
-    CellType? type = game.state.cells[pos];
-    int row = game.state.mode.row;
-    int column = game.state.mode.column;
-    int i = pos.$2;
-    int j = pos.$1;
-    if (type == CellType.value0) {
-      for (int i2 = max(0, i - 1); i2 <= min(row - 1, i + 1); i2++) {
-        for (int j2 = max(0, j - 1); j2 <= min(column - 1, j + 1); j2++) {
-          if (game.state.allowOutOpen((j2, i2))) {
-            autoOpenAt((j2, i2));
-          }
-        }
+  void handleAutoOpen(CellType? type, XY pos) {
+    if (type != CellType.value0) return;
+    int x = pos.$2;
+    int y = pos.$1;
+    for (int i = x - 1; i <= x + 1; i++) {
+      for (int j = y - 1; j <= y + 1; j++) {
+          autoOpenAt((j, i));
       }
     }
   }
 
   void unpressed() {
-    if (game.state.disable) return;
+    if (game.disable) return;
     _pressedCells.clear();
     game.emit(FaceType.common);
   }
 
   void pressed(Vector2 vector2) {
-    if (game.state.disable) return;
+    if (game.disable) return;
     game.emit(FaceType.active);
     pressedAt(trans(vector2));
   }
@@ -150,14 +154,14 @@ mixin GameCellLogic on DragCallbacks, TapCallbacks, HasGameRef<SweeperGame> {
     return (x, y);
   }
 
-  void pressedAt((int, int) pos) {
+  void pressedAt(XY pos) {
     if (!_allowPressAt(pos)) return;
     _resetPrevPressed();
     _doPressAt(pos);
   }
 
-  bool _allowPressAt((int, int) pos) {
-    return !game.state.isOpen(pos) &&
+  bool _allowPressAt(XY pos) {
+    return !game.isOpened(pos) &&
         _pressedCells.where((e) => e.pos == pos).isEmpty;
   }
 
@@ -168,33 +172,31 @@ mixin GameCellLogic on DragCallbacks, TapCallbacks, HasGameRef<SweeperGame> {
     }
   }
 
-  void _doPressAt((int, int) pos) {
+  void _doPressAt(XY pos) {
     Cell? cell = activeCell(pos);
     if (cell != null) {
-      if (game.state.isMarked(cell.pos)) {
-        cell.unMark();
-        return;
+      if(!game.isMarked(pos)){
+        cell.pressed();
       }
-      cell.pressed();
       _pressedCells.add(cell);
     }
   }
 
-  void _showAllFlag(){
-    List<XY> v = game.state.cells.keys.toList();
-    for(int i =0;i<v.length;i++){
-      CellType? type = game.state.cells[v[i]];
-      if(type==CellType.mine){
-        activeCell(v[i])?.mark();
-      }
-    }
-  }
-
-  void _debugOpenAll(){
-    List<XY> v = game.state.cells.keys.toList();
-    for(int i =0;i<v.length;i++){
-      CellType? type = game.state.cells[v[i]];
-      activeCell(v[i])?.open();
-    }
-  }
+  // void _showAllFlag() {
+  //   List<XY> v = game.cells.keys.toList();
+  //   for (int i = 0; i < v.length; i++) {
+  //     CellType? type = game.cells[v[i]];
+  //     if (type == CellType.mine) {
+  //       activeCell(v[i])?.mark();
+  //     }
+  //   }
+  // }
+  //
+  // void _debugOpenAll() {
+  //   List<XY> v = game.cells.keys.toList();
+  //   for (int i = 0; i < v.length; i++) {
+  //     CellType? type = game.cells[v[i]];
+  //     activeCell(v[i])?.open();
+  //   }
+  // }
 }
