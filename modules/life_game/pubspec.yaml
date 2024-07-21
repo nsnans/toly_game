@@ -11,12 +11,17 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.19.0
-  flame: ^1.17.0
+  flame: ^1.18.0
+  equatable: ^2.0.5
   tolyui: ^0.0.2+15
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+
+dependency_overrides:
+  tolyui:
+    path: D:\Projects\Flutter\Fx\toly_ui\modules\tolyui
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -66,3 +71,4 @@ toly:
     src_zip: 'assets/hide/download.zip' # 下载的压缩包资源
     assets_dir: 'assets/iconfonts'  # ttf文件解压的文件夹
     dist_file: 'lib/app/res/toly_icon.dart' # 生成的代码文件地址
+    font_package: 'life_game'

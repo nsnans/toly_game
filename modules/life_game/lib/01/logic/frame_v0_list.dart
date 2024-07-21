@@ -5,7 +5,7 @@
 // // Author:      张风捷特烈
 // // CreateTime:  2024-07-06
 // // Contact Me:  1981462002@qq.com
-// // 基于二维数组实现，较为复杂。已采用 [frame_v1_map.dart] 映射版
+// // 基于二维数组实现，较为复杂。已采用 [frame.dart] 映射版
 //
 // class Frame {
 //   int get row => data.length;

@@ -21,6 +21,7 @@ class LifeGameApp extends StatelessWidget {
       theme: ThemeData(),
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        primaryColor: Colors.blue,
         fontFamily: '宋体',
         scaffoldBackgroundColor: Color(0xff3c3f41),
         // textTheme:
@@ -47,7 +48,9 @@ class LifeGameApp extends StatelessWidget {
                     child: const WindowButtons())
               ],
             ),
-            Expanded(child: LifeGameView())
+            Divider(height: 1/View.of(context).devicePixelRatio,),
+            Expanded(child: LifeGameView()),
+
           ],
         ),
       ),

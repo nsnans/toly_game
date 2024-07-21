@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'dart:ui';
 
-import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_ext/flame_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:toly_game/trex/06/ext/hit_box_show.dart';
 import 'package:toly_game/trex/06/heroes/fps_text.dart';
 import '../res/extra_images.dart';
 import 'heroes/ball.dart';

@@ -13,8 +13,8 @@ dependencies:
   flutter:
     sdk: flutter
 #  flame: ^1.16.0
-  flame: ^1.17.0
-  flame_audio: ^2.10.0
+  flame: ^1.18.0
+  flame_audio: ^2.10.2
   shared_preferences: ^2.2.2
   cupertino_icons: ^1.0.2
   flame_svg: ^1.10.1
@@ -40,6 +40,10 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^2.0.0
+
+dependency_overrides:
+  tolyui:
+    path: D:\Projects\Flutter\Fx\toly_ui\modules\tolyui
 
 flutter:
   generate: true
