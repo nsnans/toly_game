@@ -12,9 +12,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/gestures/events.dart';
 
-import '../../life_game.dart';
+
+import '../game/game.dart';
+import '../logic/frame_evolve.dart';
 import '../model/evolve.dart';
 import 'action_toolbar.dart';
+import 'status_bar.dart';
 
 class LifeGameView extends StatefulWidget {
   const LifeGameView({super.key});
