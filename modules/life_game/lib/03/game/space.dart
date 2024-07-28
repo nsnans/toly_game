@@ -29,10 +29,11 @@ class SpaceManager extends PositionComponent
   SpaceManager({this.side = 20, this.row = 9, this.column = 9})
       : super(
           size: Vector2(side * row, side * column),
-          anchor: Anchor.center,
+          // anchor: Anchor.center,
         );
 
   void setFrame(Frame frame) {
+    return;
     removeWhere((e) => true);
     Map<XY, bool> data = frame.spaces;
     bool see = game.frameEvolve.seeWorld;
@@ -48,6 +49,7 @@ class SpaceManager extends PositionComponent
   @override
   void render(Canvas canvas) {
     priority = 2;
+    return;
     drawGrid(canvas, side, row, column);
   }
 

@@ -28,6 +28,7 @@ enum ToolAction {
   eraser(TolyIcon.icon_eraser),
   reset(TolyIcon.icon_reset),
   clear(TolyIcon.icon_clear),
+  zero(Icons.repeat_one_outlined),
 
   ;
 
@@ -56,41 +57,57 @@ class ActionToolbar extends StatelessWidget {
       selectColor: Colors.black,
       borderRadius: BorderRadius.all(Radius.circular(4)),
     );
+
+
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8),
       width: 30,
       alignment: Alignment.topCenter,
-      child: Wrap(
-          spacing: 6,
-          direction: Axis.vertical,
-          children: ToolAction.values.map((e) {
-            if(e==ToolAction.play){
-              return PlayCtrlButton(
-                status: status,
-                onAction: onAction,
-              );
-            }
-            if(e==ToolAction.see || e==ToolAction.paint ||
-               e==ToolAction.eraser || e==ToolAction.move){
-              return ValueListenableBuilder(
-                valueListenable: actions,
-                builder: (context,value,__) {
+      child: Column(
+        children: [
+          Expanded(
+            child: Wrap(
+                spacing: 6,
+                direction: Axis.vertical,
+                children: ToolAction.values.sublist(0,ToolAction.values.length-1).map((e) {
+                  if(e==ToolAction.play){
+                    return PlayCtrlButton(
+                      status: status,
+                      onAction: onAction,
+                    );
+                  }
+                  if(e==ToolAction.see || e==ToolAction.paint ||
+                     e==ToolAction.eraser || e==ToolAction.move){
+                    return ValueListenableBuilder(
+                      valueListenable: actions,
+                      builder: (context,value,__) {
+                        return TolyAction(
+                          selected: value.contains(e),
+                          style: style,
+                          child: Icon(e.icon, size: 18),
+                          onTap: () => onAction(e),
+                        );
+                      },
+                    );
+                  }
+
                   return TolyAction(
-                    selected: value.contains(e),
                     style: style,
                     child: Icon(e.icon, size: 18),
                     onTap: () => onAction(e),
                   );
-                },
-              );
-            }
-
-            return TolyAction(
-              style: style,
-              child: Icon(e.icon, size: 18),
-              onTap: () => onAction(e),
-            );
-          }).toList()),
+                }).toList()),
+          ),
+          TolyAction(
+            style: style,
+            child: Icon(Icons.repeat_one_outlined, size: 18),
+            onTap: (){
+              onAction(ToolAction.zero);
+            },
+          ),
+        ],
+      ),
     );
   }
 }

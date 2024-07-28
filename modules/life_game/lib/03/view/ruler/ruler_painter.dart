@@ -5,11 +5,10 @@
 // Author:      张风捷特烈
 // CreateTime:  2024-07-28
 // Contact Me:  1981462002@qq.com
-
-import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
-import '../life_game_view.dart';
+import 'area_range.dart';
+import 'ruler_value.dart';
 
 class RulerPainter extends CustomPainter {
   final RulerValue value;
@@ -27,161 +26,67 @@ class RulerPainter extends CustomPainter {
     ..color = Colors.grey
     ..strokeWidth = 0.5;
 
+  final Paint _bgPainter = Paint()..color = const Color(0xff2a2a2a);
+
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xff2a2a2a));
-    canvas.drawRect(
-        Rect.fromLTWH(20, 20, size.width - 20, size.height - 20), Paint()..color = Colors.black);
-
-    Vector3 tr = value.tansform.getTranslation();
     double side = 40;
     double scaleExtend = 20;
-
-    double s = value.tansform.getMaxScaleOnAxis();
-    Offset c = value.tansform.getTranslation().xy.toOffset();
-
-    RangeZone zone = RangeZone(x: Area(0, size.width), y: Area(0, size.height));
-    TransformData data = TransformData(c: c, s: s);
-
-    List<ScaleBox> xBoxes = zone.xBoxes(side, data);
-    List<ScaleBox> yBoxes = zone.yBoxes(side, data);
-
-    drawGrid(canvas, size, c, xBoxes, yBoxes, scaleExtend);
-    drawScale(canvas, size, c, xBoxes, yBoxes, scaleExtend);
+    double s = value.scale;
+    Offset c = value.center;
+    Range2d range = Range2d(x: Area(0, size.width), y: Area(0, size.height));
+    Scales scales = range.scales(side, c, s);
+    drawGrid(canvas, size, c, scales, scaleExtend);
+    drawScale(canvas, size, c, scales, scaleExtend);
 
     AxisPainter axis = AxisPainter(size);
-    axis.paint(canvas, _textPainter, tr.xy.toOffset());
+    axis.paint(canvas, _textPainter, c);
   }
 
-  void drawScale(
-    Canvas canvas,
-    Size size,
-    Offset c,
-    List<ScaleBox> xBoxes,
-    List<ScaleBox> yBoxes,
-    double extend,
-  ) {
-    canvas.drawRect(Offset.zero & Size(size.width, 20), Paint()..color = const Color(0xff2a2a2a));
-
+  void drawScale(Canvas canvas, Size size, Offset c, Scales scales, double extend) {
+    canvas.drawRect(Offset.zero & Size(size.width, 20), _bgPainter);
     canvas.save();
     canvas.translate(c.dx, 0);
-    paintXCell(canvas, xBoxes, extend);
+    paintScales(canvas, scales.x, extend);
     canvas.restore();
 
-    canvas.drawRect(Offset.zero & Size(20, size.height), Paint()..color = const Color(0xff2a2a2a));
-
+    canvas.drawRect(Offset.zero & Size(20, size.height), _bgPainter);
     canvas.save();
     canvas.translate(0, c.dy);
-    paintYCell(canvas, yBoxes, extend);
+    paintScales(canvas, scales.y, extend);
     canvas.restore();
   }
 
-  void drawGrid(
-    Canvas canvas,
-    Size size,
-    Offset c,
-    List<ScaleBox> xBoxes,
-    List<ScaleBox> yBoxes,
-    double extend,
-  ) {
+  void drawGrid(Canvas canvas, Size size, Offset c, Scales scales, double extend) {
     canvas.save();
     canvas.translate(c.dx, 0);
-    paintXGrid(canvas, xBoxes, extend, size.height);
+    paintGrid(canvas, scales.x, extend, size.height);
     canvas.restore();
 
     canvas.save();
     canvas.translate(0, c.dy);
-    paintYGrid(canvas, yBoxes, extend, size.width);
+    paintGrid(canvas, scales.y, extend, size.width);
     canvas.restore();
   }
-
-  void drawArea(Canvas canvas, Area area, Axis axis, double side) {}
-
-  void drawX(Canvas canvas, Size size, Area area) {}
-
-  // void drawY(Canvas canvas, Size size) {
-  //   canvas.drawRect(Offset.zero & Size(20, size.height), Paint()..color = const Color(0xff2a2a2a));
-  //
-  //   double side = 40;
-  //   double scaleWidth = 20;
-  //   Area area = Area(0, size.width);
-  //   // 使用矩阵变换点
-  //   double s = value.tansform.getMaxScaleOnAxis();
-  //   double c = value.tansform.getTranslation().y;
-  //
-  //   Area area2 = scaleArea(area, c, s, c);
-  //   //
-  //   // double a = m4.transform3(Vector3(area.a-size.width /2, 0, 0.0)).x;
-  //   // double b = m4.transform3(Vector3(area.b-size.width /2, 0, 0.0)).x;
-  //   // Area area2 = Area(a, b);
-  //
-  //   // Area area2 = scaleArea(area, c, s);
-  //
-  //   List<ScaleBox> boxes = [];
-  //
-  //   int start = (area2.a) ~/ side - 1;
-  //   int end = (area2.b) ~/ side + 1;
-  //
-  //   for (int i = start; i < end; i++) {
-  //     boxes.add(ScaleBox(i, side * s, Axis.vertical));
-  //   }
-  //
-  //   canvas.save();
-  //   canvas.translate(0, c);
-  //   paintYCell(canvas, boxes, scaleWidth);
-  //   canvas.restore();
-  // }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 
-  void paintXCell(Canvas canvas, List<ScaleBox> boxes, double height) {
+  void paintScales(Canvas canvas, List<Scale> boxes, double extend) {
     Path path = Path();
     for (int i = 0; i < boxes.length; i++) {
-      ScaleBox box = boxes[i];
-      path
-        ..moveTo(box.value * box.width, 0)
-        ..relativeLineTo(0, height);
-      box.paintText(_textPainter, canvas, height);
+      Scale box = boxes[i];
+      box.link(path, extend);
+      box.paintText(_textPainter, canvas, extend);
     }
     canvas.drawPath(path, _storkPaint);
   }
 
-  void paintYCell(Canvas canvas, List<ScaleBox> boxes, double width) {
-    Path path = Path();
-    for (int i = 0; i < boxes.length; i++) {
-      ScaleBox box = boxes[i];
-      path
-        ..moveTo(0, box.value * box.width)
-        ..relativeLineTo(width, 0);
-      box.paintText(_textPainter, canvas, width);
-    }
-    canvas.drawPath(path, _storkPaint);
-  }
-
-  void paintXGrid(Canvas canvas, List<ScaleBox> boxes, double height, double windowHeight) {
+  void paintGrid(Canvas canvas, List<Scale> boxes, double width, double extend) {
     Path gridPath = Path();
     for (int i = 0; i < boxes.length; i++) {
-      ScaleBox box = boxes[i];
-      gridPath
-        ..moveTo(box.value * box.width, height)
-        ..relativeLineTo(0, windowHeight);
-
-      box.paintText(_textPainter, canvas, height);
-    }
-    canvas.drawPath(gridPath, _gridPaint);
-  }
-
-  void paintYGrid(Canvas canvas, List<ScaleBox> boxes, double width, double windowWidth) {
-    Path gridPath = Path();
-    for (int i = 0; i < boxes.length; i++) {
-      ScaleBox box = boxes[i];
-      gridPath
-        ..moveTo(width, box.value * box.width)
-        ..relativeLineTo(windowWidth, 0);
-      box.paintText(_textPainter, canvas, width);
+      Scale box = boxes[i];
+      box.link(gridPath, extend);
     }
     canvas.drawPath(gridPath, _gridPaint);
   }

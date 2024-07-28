@@ -14,7 +14,7 @@ import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/material.dart' hide Image,Hero;
 import 'package:flutter/services.dart';
 
 import '../03/game/ruler.dart';
@@ -124,7 +124,6 @@ class PlayWord extends World {
   @override
   FutureOr<void> onLoad() {
     // add(Ruler()..priority=100);
-
     add(blockManager);
 
     return super.onLoad();

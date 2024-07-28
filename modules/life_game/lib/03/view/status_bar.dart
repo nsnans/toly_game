@@ -26,11 +26,18 @@ class StatusBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ActionStyle style = const ActionStyle(
+      backgroundColor: Colors.black,
+      padding: EdgeInsets.all(2),
+      selectColor: Colors.black,
+      borderRadius: BorderRadius.all(Radius.circular(4)),
+    );
     return Container(
       height: 26,
       padding: EdgeInsets.symmetric(horizontal: 12),
       child: Row(
         children: [
+
           Spacer(),
           ValueListenableBuilder(
             valueListenable: speed,

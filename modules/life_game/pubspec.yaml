@@ -13,15 +13,20 @@ dependencies:
   intl: ^0.19.0
   flame: ^1.18.0
   equatable: ^2.0.5
-  tolyui: ^0.0.2+15
+  tolyui: ^0.0.2+17
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
 
 dependency_overrides:
-  tolyui:
-    path: D:\Projects\Flutter\Fx\toly_ui\modules\tolyui
+  flame:
+    git:
+      url: https://github.com/toly1994328/flame.git
+      ref: 26a71c348f468d20fd5c61e168906b6bdac794d8
+      path: packages/flame
+#  tolyui:
+#    path: D:\Projects\Flutter\Fx\toly_ui\modules\tolyui
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

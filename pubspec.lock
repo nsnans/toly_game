@@ -164,10 +164,11 @@ packages:
   flame:
     dependency: "direct main"
     description:
-      name: flame
-      sha256: "79133dc46a3ff870950f41d0dc1598414e7bd7ae2c29bd9f0a9de208d9a70cb7"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "packages/flame"
+      ref: "26a71c348f468d20fd5c61e168906b6bdac794d8"
+      resolved-ref: "26a71c348f468d20fd5c61e168906b6bdac794d8"
+      url: "https://github.com/toly1994328/flame.git"
+    source: git
     version: "1.18.0"
   flame_audio:
     dependency: "direct main"
@@ -343,10 +344,10 @@ packages:
     dependency: transitive
     description:
       name: ordered_set
-      sha256: "1bfaaaee0419e43ecc9eaebd410eb4bd5039657b72011de75ff3e2915c9aac60"
+      sha256: "984658d0c28c69516ed22f780db7511932a223339463a16c0cc48b3055e926c4"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "5.0.3"
+    version: "6.0.1"
   path:
     dependency: transitive
     description:
@@ -571,18 +572,19 @@ packages:
   tolyui:
     dependency: "direct main"
     description:
-      path: "D:\\Projects\\Flutter\\Fx\\toly_ui\\modules\\tolyui"
-      relative: false
-    source: path
-    version: "0.0.2+16"
+      name: tolyui
+      sha256: "309d65a0dd0b3286aee050474cc02d0cac9b64e2837751d6c3166afcf5a61885"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.0.2+17"
   tolyui_feedback:
     dependency: transitive
     description:
       name: tolyui_feedback
-      sha256: "0efc505b83fbb3546344a9c94988938954c11f8680a9ed9e226ff82fe924053d"
+      sha256: fe1ec59e888f81298cb157d8006abed74be1fe53a14291d925ac8900ee7fa83b
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.3.4+4"
+    version: "0.3.4+5"
   tolyui_message:
     dependency: transitive
     description:
@@ -595,10 +597,10 @@ packages:
     dependency: transitive
     description:
       name: tolyui_navigation
-      sha256: "2b1c323962903406370367d2e637a785399a568554c77d87d405da8df33f79cb"
+      sha256: "82eceb167fc746c2281070b0b99091ce4485f151d84cda19d402a243c29fb542"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.0.8+6"
+    version: "0.0.8+7"
   tolyui_rx_layout:
     dependency: transitive
     description:

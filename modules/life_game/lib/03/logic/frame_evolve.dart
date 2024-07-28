@@ -54,7 +54,7 @@ class FrameEvolve with ChangeNotifier {
 
   final Map<ToolAction, bool> _selectedActionMap = {
     ToolAction.see : true,
-    ToolAction.paint : true,
+    ToolAction.move : true,
   };
 
   void handleAction(ToolAction action) {

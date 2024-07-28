@@ -97,6 +97,10 @@ class LifeGame extends FlameGame<LifeWord> with TransformableMixin, TransformGam
   @override
   bool get enable => frameEvolve.moveMode;
 
+  void fit() {
+    camera.viewfinder.transform.transformMatrix=Matrix4.translationValues(size.x/2, size.y/2, 0);
+  }
+
 }
 
 class LifeWord extends World with HasGameRef<LifeGame> {
