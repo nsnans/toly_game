@@ -33,7 +33,7 @@ class SpaceManager extends PositionComponent
         );
 
   void setFrame(Frame frame) {
-    return;
+    // return;
     removeWhere((e) => true);
     Map<XY, bool> data = frame.spaces;
     bool see = game.frameEvolve.seeWorld;

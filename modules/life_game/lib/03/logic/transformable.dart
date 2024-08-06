@@ -28,7 +28,6 @@ mixin TransformableMixin implements Transformable {
   void scale(double scale, Offset origin) {
     Matrix4 m4 = transformer.transform.transformMatrix.clone();
     // double zoom = transformer.zoom;
-    print("======scale:=========");
 
     Vector2 center = transformer.globalToLocal(Vector2(origin.dx, origin.dy));
 
