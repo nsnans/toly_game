@@ -36,9 +36,6 @@ class MainGame extends FlameGame<PlayWord> with KeyboardEvents, TransformableMix
     // add(Ruler()..priority=100);
 
     // add(FpsText(color: Colors.white));
-;
-
-
   }
 
 

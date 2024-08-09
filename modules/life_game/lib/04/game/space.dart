@@ -51,6 +51,8 @@ class SpaceManager extends PositionComponent with HasGameRef<LifeGame>{
   }
 }
 
+
+
 class Space extends PositionComponent {
   final XY p;
   final double side;

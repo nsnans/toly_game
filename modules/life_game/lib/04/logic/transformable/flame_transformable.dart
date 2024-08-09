@@ -17,9 +17,6 @@ import 'transformable.dart';
 mixin TransformGame<T extends World> on TransformableMixin, FlameGame<T> implements Transformable {
   bool get enable;
 
-
-
-
   @override
   void scale(double scale, Offset origin) {
     if (!enable || scale < 0.3) return;
@@ -39,19 +36,12 @@ mixin TransformGame<T extends World> on TransformableMixin, FlameGame<T> impleme
 
   void onTransformTick();
 
-  int get tickInterval;
-  int _lastTransformTick = 0;
+
 
   @override
   void onMatrixChange(Matrix4 m4) {
     camera.viewfinder.transform.transformMatrix = m4;
     // 限制触发 onTransformTick 的频率
-    int now = DateTime.now().millisecondsSinceEpoch;
-    if (now - _lastTransformTick < tickInterval) {
-      return;
-    }
     onTransformTick();
-    paused = false;
-    _lastTransformTick = now;
   }
 }

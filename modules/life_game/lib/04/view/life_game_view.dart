@@ -156,7 +156,6 @@ class _LifeGameViewState extends State<LifeGameView> {
     rulerValue.transform = game.camera.viewfinder.transform.transformMatrix.clone();
   }
 
-  int _lastTransformTick = 0;
 
 
 
@@ -164,28 +163,23 @@ class _LifeGameViewState extends State<LifeGameView> {
     if (game.frameEvolve.moveMode) return;
 
     int now = DateTime.now().millisecondsSinceEpoch;
-    bool render = false;
-    if (now-_lastTransformTick > 50) {
-      render =true;
-      _lastTransformTick = now;
 
-    }
 
     Vector2 v2 = game.camera.viewfinder.globalToLocal(Vector2(position.dx, position.dy));
     (int, int) pos = ((v2.x / 20).floor(), (v2.y / 20).floor());
 
     if (game.frameEvolve.paintMode) {
-      game.birth(pos,render:render);
+      game.birth(pos,render:true);
       return;
     }
 
     if (game.frameEvolve.deleteMode) {
-      game.died(pos,render:render );
+      game.died(pos,render:true );
     }
   }
 }
 
-class TransformWrapper extends StatelessWidget {
+class TransformWrapper extends StatefulWidget {
   final Widget child;
   final Transformable transformable;
   final RulerValue rulerValue;
@@ -199,6 +193,11 @@ class TransformWrapper extends StatelessWidget {
       required this.onPaint});
 
   @override
+  State<TransformWrapper> createState() => _TransformWrapperState();
+}
+
+class _TransformWrapperState extends State<TransformWrapper> {
+  @override
   Widget build(BuildContext context) {
     return ClipRect(
       child: Listener(
@@ -208,9 +207,9 @@ class TransformWrapper extends StatelessWidget {
         child: Stack(
           fit: StackFit.passthrough,
           children: [
-            child,
+            widget.child,
             CustomPaint(
-              painter: RulerPainter(rulerValue),
+              painter: RulerPainter(widget.rulerValue),
               child: const Center(),
             )
           ],
@@ -224,17 +223,21 @@ class TransformWrapper extends StatelessWidget {
       bool larger = event.scrollDelta.dy < 0;
       double newZoom = larger ? 1 + 0.05 : 1 - 0.05;
       if (newZoom < 0.01 || newZoom > 20) return;
-      transformable.scale(newZoom, event.localPosition);
+      widget.transformable.scale(newZoom, event.localPosition);
     }
   }
 
+  Offset laseMove = Offset.zero;
+
   void _onPointerMove(PointerMoveEvent event) {
-    transformable.translation(event.delta);
-    onPaint(event.localPosition);
+    widget.transformable.translation(event.delta);
+    laseMove = event.localPosition;
+    widget.onPaint(event.localPosition);
   }
 
   void _onPointerDown(PointerDownEvent event) {
-    onPaint(event.localPosition);
+    widget.onPaint(event.localPosition);
   }
+
 }
 

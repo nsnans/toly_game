@@ -17,6 +17,7 @@ import 'package:life_game/03/game/ruler.dart';
 
 import '../logic/frame.dart';
 import '../logic/frame_evolve.dart';
+import '../logic/throttle.dart';
 import '../logic/transformable/flame_transformable.dart';
 import '../logic/transformable/transformable.dart';
 import '../view/action_toolbar.dart';
@@ -124,21 +125,40 @@ class LifeGame extends FlameGame<LifeWord> with TransformableMixin, TransformGam
     world.setFrame(frame);
   }
 
-  @override
-  int get tickInterval => frameEvolve.seeWorld ? 200 : 100;
-
 }
 
 class LifeWord extends World with HasGameRef<LifeGame> {
+
+  late Throttled<Frame> _throttled;
+  late Throttled<Frame> _throttledPainter;
+
+  @override
+  FutureOr<void> onLoad() {
+    _throttled = throttle(duration: const Duration(milliseconds: 100), function: _render);
+    _throttledPainter = throttle(duration: const Duration(milliseconds: 50), function: _render);
+    return super.onLoad();
+  }
+
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
-    setFrame(game.frame);
+    _throttled(game.frame);
   }
 
   void setFrame(Frame frame) {
+    if(game.frameEvolve.moveMode){
+      _throttled(frame);
+    }else{
+      _throttledPainter(frame);
+    }
+  }
+
+  void _render(Frame frame) {
     removeWhere((e) => true);
     final SpaceManager spaceManager = SpaceManager(game.frame);
     add(spaceManager);
+    game.paused=false;
   }
 }
+
+
