@@ -21,11 +21,15 @@ dependencies:
   flame_forge2d: ^0.16.0+5
   flutter_svg: ^2.0.10+1
   window_manager: ^0.3.8      # 桌面管理
+
+
 #  web: ^0.5.1
   flame_ext:
     path: packages/flame_ext
   life_game:
     path: modules/life_game
+  snake:
+    path: modules/snake
 
   # 国际化
   flutter_localizations:
