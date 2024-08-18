@@ -42,8 +42,8 @@ class Ground extends PositionComponent with HasGameRef<SnakeGame> {
 
   Paint girdPaint = Paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 1
-    ..color = const Color(0xffffffff);
+    ..strokeWidth=1
+    ..color = const Color(0x4400ffff);
 
   void drawGrid(Canvas canvas, double boxSize, int row, int column) {
 

@@ -18,13 +18,15 @@ enum Direction {
   }
 }
 
-abstract class DirectionChange {
+abstract class GameOperation {
   void onDirectionChange(Direction direction);
 
-  void onStart();
+  void onSpaceCtrl();
+
+  void onSpeedUp();
 }
 
-mixin DirectionCtrlMixin on KeyboardEvents implements DirectionChange {
+mixin DirectionCtrlMixin on KeyboardEvents implements GameOperation {
   Direction lastDirection = Direction.up;
 
   @override
@@ -36,7 +38,11 @@ mixin DirectionCtrlMixin on KeyboardEvents implements DirectionChange {
       }
 
       if(keysPressed.contains(LogicalKeyboardKey.space)){
-        onStart();
+        onSpaceCtrl();
+      }
+
+      if(keysPressed.contains(LogicalKeyboardKey.keyF)){
+        onSpeedUp();
       }
     }
     return super.onKeyEvent(event, keysPressed);
@@ -64,4 +70,5 @@ mixin DirectionCtrlMixin on KeyboardEvents implements DirectionChange {
     if (isArrowRight) return Direction.right;
     return null;
   }
+
 }

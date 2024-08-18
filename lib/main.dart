@@ -11,7 +11,7 @@ import '../utils/size_utils.dart';
 
 main() {
   runApp(SnakeGameApp());
-  SizeUtils.setSize(size: const Size(800, 460));
+  SizeUtils.setSize(size: const Size(842, 522));
   // runApp(LifeGameApp());
   // SizeUtils.setSize(size: const Size(800, 460));
 }

@@ -7,7 +7,7 @@ import 'utils/platform_adapter/views/window_buttons.dart';
 import 'utils/platform_adapter/window/windows_adapter.dart';
 
 class SnakeGameApp extends StatelessWidget {
-  const SnakeGameApp({super.key});
+  SnakeGameApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +25,9 @@ class SnakeGameApp extends StatelessWidget {
       ),
     );
   }
-
+  final SnakeGame snakeGame =  SnakeGame();
   Widget _buildHomeByPlatform() {
-    Widget home =  GameWidget(game: SnakeGame());
+    Widget home =  GameGestureDetector(game:  snakeGame);
     if (kIsDesk) {
       home = Column(
         children: [
